@@ -15,10 +15,7 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +30,7 @@ public class CustomSheetsReading {
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Arrays.asList(SheetsScopes.SPREADSHEETS);
-    private static final String CREDENTIALS_FILE_PATH = "/oauth_credentials.json";
+    private static final String CREDENTIALS_FILE_PATH = "C:\\Users\\Quoc Cuong\\Desktop\\oauth_credentials.json";
 
     /**
      * Creates an authorized Credential object.
@@ -43,7 +40,11 @@ public class CustomSheetsReading {
      */
     public static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         // Load client secrets.
-        InputStream in = CustomSheetsReading.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+//        InputStream in = CustomSheetsReading.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        InputStream in = null;
+        ClassLoader classLoader = CustomSheetsReading.class.getClass().getClassLoader();
+        File file = new File(classLoader.getResource(CREDENTIALS_FILE_PATH).getFile());
+        in = new FileInputStream(file);
         if (in == null) {
             throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
         }

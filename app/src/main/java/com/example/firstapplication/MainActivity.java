@@ -100,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
+                final String spreadsheetId = "1AXCuR1rsi77guOiqX_YyKV-wQv28o99tIrQkspNiU3I";
+                final String range = "Custom!A3:C";
+
                 if (barcodes.size() != 0) {
                     txtBarcodeValue.post(new Runnable() {
                         @Override
@@ -109,60 +112,49 @@ public class MainActivity extends AppCompatActivity {
 
                             final NetHttpTransport HTTP_TRANSPORT;
                             try {
-                                HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-                            } catch (GeneralSecurityException e) {
-                                throw new RuntimeException(e);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            final String spreadsheetId = "1AXCuR1rsi77guOiqX_YyKV-wQv28o99tIrQkspNiU3I";
-                            final String range = "Custom!A3:C";
-                            Sheets service = null;
-                            try {
-                                service = new Sheets.Builder(HTTP_TRANSPORT, CustomSheetsReading.JSON_FACTORY,
+//                                HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+                                HTTP_TRANSPORT = new com.google.api.client.http.javanet.NetHttpTransport();
+                                Sheets service = new Sheets.Builder(HTTP_TRANSPORT, CustomSheetsReading.JSON_FACTORY,
                                         CustomSheetsReading.getCredentials(HTTP_TRANSPORT))
                                         .setApplicationName(CustomSheetsReading.APPLICATION_NAME)
                                         .build();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
+                                // Append data to sheet
+                                ValueRange appendBody = new ValueRange()
+                                        .setValues(Arrays.asList(
+                                                Arrays.asList("Nguyễn Thị", "Linh", "Frontend Engineer")));
+                                AppendValuesResponse appendResult = null;
 
-                    // Append data to sheet
-                            ValueRange appendBody = new ValueRange()
-                                    .setValues(Arrays.asList(
-                                            Arrays.asList("Nguyễn Thị", "Linh", "Frontend Engineer")));
-                            AppendValuesResponse appendResult = null;
-                            try {
                                 appendResult = service.spreadsheets().values()
                                         .append(spreadsheetId, "A5", appendBody)
                                         .setValueInputOption("USER_ENTERED")
                                         .setInsertDataOption("INSERT_ROWS")
                                         .setIncludeValuesInResponse(true)
                                         .execute();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            if(appendResult != null)
-                                System.out.println("\nAppending data successfully!\n");
 
-                            // Read sheet's data
-                            ValueRange response = null;
-                            try {
+                                if(appendResult != null)
+                                    System.out.println("\nAppending data successfully!\n");
+
+                                // Read sheet's data
+                                ValueRange response = null;
                                 response = service.spreadsheets().values()
                                         .get(spreadsheetId, range)
                                         .execute();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            List<List<Object>> values = response.getValues();
-                            if (values == null || values.isEmpty()) {
-                                System.out.println("No data found.");
-                            } else {
-                                for (List row : values) {
-                                    // Print columns A and E, which correspond to indices from 0 to 5.
-                                    System.out.printf("%s - %s - %s\n",
-                                            row.get(0), row.get(1), row.get(2));
+
+                                List<List<Object>> values = response.getValues();
+                                if (values == null || values.isEmpty()) {
+                                    System.out.println("No data found.");
+                                } else {
+                                    for (List row : values) {
+                                        // Print columns A and E, which correspond to indices from 0 to 5.
+                                        System.out.printf("%s - %s - %s\n",
+                                                row.get(0), row.get(1), row.get(2));
+                                    }
                                 }
+                                Toast.makeText(getApplicationContext(), "Send message successfully!",
+                                                                                            Toast.LENGTH_SHORT);
+                            }
+                            catch (Exception exception){
+                                exception.printStackTrace();
                             }
                         }
                     });
