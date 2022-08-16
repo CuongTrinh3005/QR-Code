@@ -5,18 +5,14 @@ import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInsta
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
-import com.google.api.services.sheets.v4.model.ValueRange;
+import android.os.Environment;
 
 import java.io.*;
-import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,7 +26,7 @@ public class CustomSheetsReading {
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Arrays.asList(SheetsScopes.SPREADSHEETS);
-    private static final String CREDENTIALS_FILE_PATH = "C:\\Users\\Quoc Cuong\\Desktop\\oauth_credentials.json";
+    private static final String CREDENTIALS_FILE_PATH = "/oauth_credentials.json";
 
     /**
      * Creates an authorized Credential object.
@@ -40,17 +36,16 @@ public class CustomSheetsReading {
      */
     public static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         // Load client secrets.
-//        InputStream in = CustomSheetsReading.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        InputStream in = null;
-        ClassLoader classLoader = CustomSheetsReading.class.getClass().getClassLoader();
-        File file = new File(classLoader.getResource(CREDENTIALS_FILE_PATH).getFile());
-        in = new FileInputStream(file);
-        if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-        }
+        InputStream in = CustomSheetsReading.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
         // Build flow and trigger user authorization request.
+        File tokenFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
+                File.separator + TOKENS_DIRECTORY_PATH);
+        if (!tokenFolder.exists()) {
+            tokenFolder.mkdirs();
+        }
+
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                 .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))

@@ -1,8 +1,7 @@
 package com.example.firstapplication;
 
+import android.content.Context;
 import android.view.SurfaceView;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,17 +17,17 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
+import java.io.File;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.example.firstapplication.CustomSheetsReading.TOKENS_DIRECTORY_PATH;
 
 public class MainActivity extends AppCompatActivity {
     SurfaceView surfaceView;
@@ -113,7 +112,12 @@ public class MainActivity extends AppCompatActivity {
                             final NetHttpTransport HTTP_TRANSPORT;
                             try {
 //                                HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+//                                File dataDirectory = new File(MainActivity.this.getApplicationContext().getFilesDir(), TOKENS_DIRECTORY_PATH);
+//                                if(!dataDirectory.exists()){
+//                                    dataDirectory.mkdirs();
+//                                }
                                 HTTP_TRANSPORT = new com.google.api.client.http.javanet.NetHttpTransport();
+//                                File folder = getDir(TOKENS_DIRECTORY_PATH, Context.MODE_PRIVATE);
                                 Sheets service = new Sheets.Builder(HTTP_TRANSPORT, CustomSheetsReading.JSON_FACTORY,
                                         CustomSheetsReading.getCredentials(HTTP_TRANSPORT))
                                         .setApplicationName(CustomSheetsReading.APPLICATION_NAME)
