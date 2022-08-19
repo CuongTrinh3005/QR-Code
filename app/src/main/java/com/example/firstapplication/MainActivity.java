@@ -1,7 +1,10 @@
 package com.example.firstapplication;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,34 +16,46 @@ import android.content.pm.PackageManager;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import androidx.core.app.ActivityCompat;
+import com.android.volley.*;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
-import com.google.api.services.sheets.v4.model.ValueRange;
-
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.example.firstapplication.CustomSheetsReading.TOKENS_DIRECTORY_PATH;
+import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
+    /**
+     * Global instance of the scopes required by this quickstart.
+     * If modifying these scopes, delete your previously saved tokens/ folder.
+     */
+    /**
+     * Creates an authorized Credential object.
+     * @param HTTP_TRANSPORT The network HTTP Transport.
+     * @return An authorized Credential object.
+     * @throws IOException If the credentials.json file cannot be found.
+     */
     SurfaceView surfaceView;
     TextView txtBarcodeValue;
+    Button btnAction;
     private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
+    private static Context mContext;
+    private RequestQueue queue;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
     String intentData = "";
-    boolean isEmail = false;
+    String URL = "https://script.google.com/macros/s/AKfycbyWOtmVYxqViQj5ouhKXomrHs-yPYDlnrifE2g0wKYXZdN4_m78ttzzrNt8M7jomE2q/exec";
+
+    public static Context getContext(){
+        return mContext;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this;
         setContentView(R.layout.activity_main);
         initViews();
     }
@@ -48,6 +63,43 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() {
         txtBarcodeValue = findViewById(R.id.txtBarcodeValue);
         surfaceView = findViewById(R.id.surfaceView);
+        btnAction = findViewById(R.id.btnAction);
+        btnAction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (intentData.length() > 0) {
+                    StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            txtBarcodeValue.setText(response.toString());
+                            Toast.makeText(MainActivity.this, response.toString(),Toast.LENGTH_LONG).show();
+                            intentData = "";
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d("error",error.toString());
+                        }
+                    })
+                    {
+                        @Override
+                        protected Map<String, String> getParams(){
+                            Map<String, String> params = new HashMap<>();
+                            params.put("action", "addItem");
+                            params.put("info", intentData);
+
+                            return params;
+                        }
+                    };
+                    int socketTimeout = 50000;
+
+                    RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                    stringRequest.setRetryPolicy(retryPolicy);
+                    queue = Volley.newRequestQueue(MainActivity.this);
+                    queue.add(stringRequest);
+                }
+            }
+        });
     }
 
     private void initialiseDetectorsAndSources() {
@@ -99,67 +151,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
-                final String spreadsheetId = "1AXCuR1rsi77guOiqX_YyKV-wQv28o99tIrQkspNiU3I";
-                final String range = "Custom!A3:C";
-
                 if (barcodes.size() != 0) {
                     txtBarcodeValue.post(new Runnable() {
                         @Override
                         public void run() {
                             intentData = barcodes.valueAt(0).displayValue;
                             txtBarcodeValue.setText(intentData);
-
-                            final NetHttpTransport HTTP_TRANSPORT;
-                            try {
-//                                HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-//                                File dataDirectory = new File(MainActivity.this.getApplicationContext().getFilesDir(), TOKENS_DIRECTORY_PATH);
-//                                if(!dataDirectory.exists()){
-//                                    dataDirectory.mkdirs();
-//                                }
-                                HTTP_TRANSPORT = new com.google.api.client.http.javanet.NetHttpTransport();
-//                                File folder = getDir(TOKENS_DIRECTORY_PATH, Context.MODE_PRIVATE);
-                                Sheets service = new Sheets.Builder(HTTP_TRANSPORT, CustomSheetsReading.JSON_FACTORY,
-                                        CustomSheetsReading.getCredentials(HTTP_TRANSPORT))
-                                        .setApplicationName(CustomSheetsReading.APPLICATION_NAME)
-                                        .build();
-                                // Append data to sheet
-                                ValueRange appendBody = new ValueRange()
-                                        .setValues(Arrays.asList(
-                                                Arrays.asList("Nguyễn Thị", "Linh", "Frontend Engineer")));
-                                AppendValuesResponse appendResult = null;
-
-                                appendResult = service.spreadsheets().values()
-                                        .append(spreadsheetId, "A5", appendBody)
-                                        .setValueInputOption("USER_ENTERED")
-                                        .setInsertDataOption("INSERT_ROWS")
-                                        .setIncludeValuesInResponse(true)
-                                        .execute();
-
-                                if(appendResult != null)
-                                    System.out.println("\nAppending data successfully!\n");
-
-                                // Read sheet's data
-                                ValueRange response = null;
-                                response = service.spreadsheets().values()
-                                        .get(spreadsheetId, range)
-                                        .execute();
-
-                                List<List<Object>> values = response.getValues();
-                                if (values == null || values.isEmpty()) {
-                                    System.out.println("No data found.");
-                                } else {
-                                    for (List row : values) {
-                                        // Print columns A and E, which correspond to indices from 0 to 5.
-                                        System.out.printf("%s - %s - %s\n",
-                                                row.get(0), row.get(1), row.get(2));
-                                    }
-                                }
-                                Toast.makeText(getApplicationContext(), "Send message successfully!",
-                                                                                            Toast.LENGTH_SHORT);
-                            }
-                            catch (Exception exception){
-                                exception.printStackTrace();
-                            }
                         }
                     });
                 }

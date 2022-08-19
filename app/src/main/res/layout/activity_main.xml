@@ -23,11 +23,11 @@
             android:textSize="20sp" />
 
 
-<!--    <Button-->
-<!--            android:id="@+id/btnAction"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_alignParentBottom="true"-->
-<!--            android:background="#0000FF"-->
-<!--            android:text="SAVE"/>-->
+    <Button
+            android:id="@+id/btnAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="#0000FF"
+            android:text="@string/btn_label"/>
 </RelativeLayout>
