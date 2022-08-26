@@ -1,12 +1,12 @@
 package com.example.firstapplication;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -68,12 +68,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (intentData.length() > 0) {
+                    btnAction.setEnabled(false);
                     StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             txtBarcodeValue.setText(response.toString());
                             Toast.makeText(MainActivity.this, response.toString(),Toast.LENGTH_LONG).show();
                             intentData = "";
+                            btnAction.setEnabled(true);
                         }
                     }, new Response.ErrorListener() {
                         @Override
