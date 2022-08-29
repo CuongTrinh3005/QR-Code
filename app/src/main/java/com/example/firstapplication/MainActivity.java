@@ -44,13 +44,22 @@ public class MainActivity extends AppCompatActivity {
         btnTueThu = findViewById(R.id.btnTueThu);
         btnSunday = findViewById(R.id.btnSunday);
         btnEarly = findViewById(R.id.btnEarly);
+
+        Boolean tueThuAllowed = com.example.firstapplication.utils.Helper.checkTueAndThuAllowed();
+        btnTueThu.setEnabled(tueThuAllowed);
+
+        Boolean sundayAllowed = com.example.firstapplication.utils.Helper.checkSundayAllowed();
+        btnSunday.setEnabled(sundayAllowed);
+
+        Boolean sundayEarlyAllowed = com.example.firstapplication.utils.Helper.checkSundayEarlyAllowed();
+        btnEarly.setEnabled(sundayEarlyAllowed);
     }
 
     private void setEvents() {
         btnTueThu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ScannedTueThu.class);
+                Intent intent = new Intent(MainActivity.this, ScannedActivity.class);
                 intent.putExtra("sheetName", "T3T5");
                 startActivity(intent);
             }
@@ -59,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         btnSunday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ScannedTueThu.class);
+                Intent intent = new Intent(MainActivity.this, ScannedActivity.class);
                 intent.putExtra("sheetName", "CN");
                 startActivity(intent);
             }
@@ -67,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         btnEarly.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ScannedTueThu.class);
+                Intent intent = new Intent(MainActivity.this, ScannedActivity.class);
                 intent.putExtra("sheetName", "DILESOM");
                 startActivity(intent);
             }

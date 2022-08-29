@@ -20,6 +20,8 @@ import androidx.core.app.ActivityCompat;
 import com.android.volley.*;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.firstapplication.db.DatabaseHandler;
+import com.example.firstapplication.entity.Attendace;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -30,7 +32,7 @@ import java.util.*;
 
 import static com.example.firstapplication.Helper.setActionBarBackGroundColor;
 
-public class ScannedTueThu extends AppCompatActivity {
+public class ScannedActivity extends AppCompatActivity {
     /**
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
@@ -64,6 +66,26 @@ public class ScannedTueThu extends AppCompatActivity {
         setContentView(R.layout.activity_scanned_tue_thu);
         initViews();
         sheetName = getIntent().getStringExtra("sheetName");
+        DatabaseHandler db = new DatabaseHandler(this);
+
+//        Log.d("Insert: ", "Inserting ..");
+//        db.addAttendance(new Attendace("Test1",
+//                com.example.firstapplication.utils.Helper.convertDateToString(new Date())));
+//        db.addAttendance(new Attendace("Test2",
+//                com.example.firstapplication.utils.Helper.convertDateToString(new Date())));
+//        db.addAttendance(new Attendace("Test3",
+//                com.example.firstapplication.utils.Helper.convertDateToString(new Date())));
+//
+//        // Reading all contacts
+//        Log.d("Reading: ", "Reading all contacts..");
+//        List<Attendace> attendances = db.getAllAttendances();
+//
+//        for (Attendace attendace : attendances) {
+//            String log = "Id: " + attendace.getId() + " ,Info: " + attendace.getInfo() + " ,Scanned Date: " +
+//                    attendace.getScannedDate();
+//            // Writing Contacts to log
+//            Log.d("Record: ", log);
+//        }
     }
 
     @Override
@@ -88,36 +110,38 @@ public class ScannedTueThu extends AppCompatActivity {
             public void onClick(View v) {
                 if (intentData.length() > 0 & sheetName.length() > 0) {
                     btnAction.setEnabled(false);
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            txtBarcodeValue.setText(response.toString());
-                            Toast.makeText(ScannedTueThu.this, response.toString(), Toast.LENGTH_LONG).show();
-                            intentData = "";
-                            btnAction.setEnabled(true);
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d("error", error.toString());
-                        }
-                    }) {
-                        @Override
-                        protected Map<String, String> getParams() {
-                            Map<String, String> params = new HashMap<>();
-                            params.put("action", "addItem");
-                            params.put("sheetName", sheetName);
-                            params.put("info", intentData);
+//                    StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+//                        @Override
+//                        public void onResponse(String response) {
+//                            txtBarcodeValue.setText(response.toString());
+//                            Toast.makeText(ScannedActivity.this, response.toString(), Toast.LENGTH_LONG).show();
+//                            intentData = "";
+//                            btnAction.setEnabled(true);
+//                        }
+//                    }, new Response.ErrorListener() {
+//                        @Override
+//                        public void onErrorResponse(VolleyError error) {
+//                            Log.d("error", error.toString());
+//                        }
+//                    }) {
+//                        @Override
+//                        protected Map<String, String> getParams() {
+//                            Map<String, String> params = new HashMap<>();
+//                            params.put("action", "addItem");
+//                            params.put("sheetName", sheetName);
+//                            params.put("info", intentData);
+//
+//                            return params;
+//                        }
+//                    };
+//                    int socketTimeout = 50000;
+//
+//                    RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+//                    stringRequest.setRetryPolicy(retryPolicy);
+//                    queue = Volley.newRequestQueue(ScannedActivity.this);
+//                    queue.add(stringRequest);
 
-                            return params;
-                        }
-                    };
-                    int socketTimeout = 50000;
 
-                    RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-                    stringRequest.setRetryPolicy(retryPolicy);
-                    queue = Volley.newRequestQueue(ScannedTueThu.this);
-                    queue.add(stringRequest);
                 }
             }
         });
@@ -139,11 +163,11 @@ public class ScannedTueThu extends AppCompatActivity {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 try {
-                    if (ActivityCompat.checkSelfPermission(ScannedTueThu.this, Manifest.permission.CAMERA)
+                    if (ActivityCompat.checkSelfPermission(ScannedActivity.this, Manifest.permission.CAMERA)
                             == PackageManager.PERMISSION_GRANTED) {
                         cameraSource.start(surfaceView.getHolder());
                     } else {
-                        ActivityCompat.requestPermissions(ScannedTueThu.this, new
+                        ActivityCompat.requestPermissions(ScannedActivity.this, new
                                 String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                     }
                 } catch (IOException e) {
