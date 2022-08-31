@@ -5,6 +5,17 @@ public class Attendace {
     private String info;
     private String scannedDate;
 
+    public Attendace(String info, String scannedDate) {
+        this.info = info;
+        this.scannedDate = scannedDate;
+    }
+
+    public Attendace(Integer id, String info, String scannedDate) {
+        this.id = id;
+        this.info = info;
+        this.scannedDate = scannedDate;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -26,17 +37,6 @@ public class Attendace {
     }
 
     public void setScannedDate(String scannedDate) {
-        this.scannedDate = scannedDate;
-    }
-
-    public Attendace(String info, String scannedDate) {
-        this.info = info;
-        this.scannedDate = scannedDate;
-    }
-
-    public Attendace(Integer id, String info, String scannedDate) {
-        this.id = id;
-        this.info = info;
         this.scannedDate = scannedDate;
     }
 }

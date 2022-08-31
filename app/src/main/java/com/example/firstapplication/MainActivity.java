@@ -1,6 +1,7 @@
 package com.example.firstapplication;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -8,7 +9,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 
 import static com.example.firstapplication.Helper.setActionBarBackGroundColor;
 
@@ -45,14 +45,14 @@ public class MainActivity extends AppCompatActivity {
         btnSunday = findViewById(R.id.btnSunday);
         btnEarly = findViewById(R.id.btnEarly);
 
-        Boolean tueThuAllowed = com.example.firstapplication.utils.Helper.checkTueAndThuAllowed();
-        btnTueThu.setEnabled(tueThuAllowed);
-
-        Boolean sundayAllowed = com.example.firstapplication.utils.Helper.checkSundayAllowed();
-        btnSunday.setEnabled(sundayAllowed);
-
-        Boolean sundayEarlyAllowed = com.example.firstapplication.utils.Helper.checkSundayEarlyAllowed();
-        btnEarly.setEnabled(sundayEarlyAllowed);
+//        Boolean tueThuAllowed = com.example.firstapplication.utils.Helper.checkTueAndThuAllowed();
+//        btnTueThu.setEnabled(tueThuAllowed);
+//
+//        Boolean sundayAllowed = com.example.firstapplication.utils.Helper.checkSundayAllowed();
+//        btnSunday.setEnabled(sundayAllowed);
+//
+//        Boolean sundayEarlyAllowed = com.example.firstapplication.utils.Helper.checkSundayEarlyAllowed();
+//        btnEarly.setEnabled(sundayEarlyAllowed);
     }
 
     private void setEvents() {
