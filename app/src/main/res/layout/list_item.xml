@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/relativeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/listPreferredItemHeightLarge"
+                android:background="@drawable/border">
+
+    <TextView
+            android:id="@+id/tvItemInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:gravity="center_vertical"
+            android:textSize="16sp"/>
+
+    <TextView
+            android:id="@+id/tvItemScannedDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/tvItemInfo"
+            android:layout_toRightOf="@id/tvItemInfo"
+            android:gravity="center_vertical"
+            android:textSize="16sp"/>
+
+    <TextView
+            android:id="@+id/tvItemStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/tvItemScannedDate"
+            android:layout_toRightOf="@id/tvItemScannedDate"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:text="Chưa đồng bộ"
+            android:textColor="@color/red"
+            android:textSize="12sp"/>
+
+</RelativeLayout>

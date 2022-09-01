@@ -6,7 +6,12 @@ import java.util.Date;
 import java.util.List;
 
 public class Helper {
-    public static final List<String> allowedDaysOfWeek = Arrays.asList("MON", "THU", "SUN");
+    public static final List<String> allowedDaysOfWeek = Arrays.asList("TUE", "THU", "SUN");
+
+    public static String getDateTime(Date date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        return formatter.format(date);
+    }
 
     public static String convertDateToString(Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");

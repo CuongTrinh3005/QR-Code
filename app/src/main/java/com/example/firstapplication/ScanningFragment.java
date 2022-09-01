@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.*;
 import android.widget.Button;
@@ -12,17 +11,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import com.android.volley.*;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.example.firstapplication.db.DatabaseHandler;
+import com.example.firstapplication.entity.Attendance;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ScanningFragment extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION = 201;
@@ -31,11 +27,10 @@ public class ScanningFragment extends Fragment {
     TextView txtBarcodeValue;
     Button btnAction;
     String intentData = "", sheetName = "";
-    String URL = "https://script.google.com/macros/s/AKfycbyWOtmVYxqViQj5ouhKXomrHs-yPYDlnrifE2g0wKYXZdN4_m78ttzzrNt8M7jomE2q/exec";
     private View view;
     private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
-    private RequestQueue queue;
+    DatabaseHandler databaseHandler = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,6 +40,8 @@ public class ScanningFragment extends Fragment {
         initViews(view);
         initialiseDetectorsAndSources();
         sheetName = getActivity().getIntent().getStringExtra("sheetName");
+        databaseHandler = new DatabaseHandler(getActivity());
+
         return view;
     }
 
@@ -57,36 +54,10 @@ public class ScanningFragment extends Fragment {
             public void onClick(View v) {
                 if (intentData.length() > 0 & sheetName.length() > 0) {
                     btnAction.setEnabled(false);
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            txtBarcodeValue.setText(response.toString());
-                            Toast.makeText(getContext(), response.toString(), Toast.LENGTH_LONG).show();
-                            intentData = "";
-                            btnAction.setEnabled(true);
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d("error", error.toString());
-                        }
-                    }) {
-                        @Override
-                        protected Map<String, String> getParams() {
-                            Map<String, String> params = new HashMap<>();
-                            params.put("action", "addItem");
-                            params.put("sheetName", sheetName);
-                            params.put("info", intentData);
-
-                            return params;
-                        }
-                    };
-                    int socketTimeout = 50000;
-
-                    RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-                    stringRequest.setRetryPolicy(retryPolicy);
-                    queue = Volley.newRequestQueue(getContext());
-                    queue.add(stringRequest);
+                    Attendance attendance = new Attendance(intentData, sheetName);
+                    databaseHandler.addAttendance(attendance);
+                    Toast.makeText(getContext(), "Đã lưu", Toast.LENGTH_LONG).show();
+                    btnAction.setEnabled(true);
                 }
             }
         });

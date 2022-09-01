@@ -7,6 +7,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import com.example.firstapplication.adapters.ViewPageAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 import static com.example.firstapplication.Helper.setActionBarBackGroundColor;
