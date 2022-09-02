@@ -1,5 +1,6 @@
 package com.example.firstapplication;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import com.example.firstapplication.adapters.AttendanceListAdapter;
 import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.entity.Attendance;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,8 @@ public class HistoryFragment extends Fragment {
     private DatabaseHandler databaseHandler = null;
     private AttendanceListAdapter attendanceListAdapter = null;
     private RequestQueue queue;
+    MediaPlayer mp = null;
+    private Integer noOfRecord = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,32 +43,39 @@ public class HistoryFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_history, container, false);
         databaseHandler = new DatabaseHandler(getActivity());
         initView(view);
+        mp = MediaPlayer.create(getContext(), R.raw.success);
+
         return view;
     }
 
     private void initView(View view) {
         tvHistory = view.findViewById(R.id.tvHistory);
         recyclerView = view.findViewById(R.id.recycleView);
-        List<Attendance> attendances = databaseHandler.getAllAttendances();
-        attendanceListAdapter = new AttendanceListAdapter(attendances);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(attendanceListAdapter);
+        renderRecycleView();
 
         btnSync = view.findViewById(R.id.btnSync);
+        controlSyncButton();
+
         btnSync.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                btnSync.setEnabled(false);
+                Toast.makeText(getContext(), "Quá trình đồng bộ bắt đầu, vui lòng chờ ...", Toast.LENGTH_LONG).show();
                 try {
-                    btnSync.setEnabled(false);
-                    List<Attendance> attendancesPreSynced = databaseHandler.getAllAttendances();
+                    List<Attendance> attendancesPreSynced = databaseHandler.getAttendancesHaveNotSyncedYet();
                     for (Attendance attendancePreSynced : attendancesPreSynced) {
                         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
                                 databaseHandler.updateAttendanceStatus(attendancePreSynced, 1);
-                                Toast.makeText(getContext(), response.toString(), Toast.LENGTH_LONG).show();
-                                btnSync.setEnabled(true);
+                                noOfRecord++;
+                                if(noOfRecord == attendancesPreSynced.size()){
+                                    renderRecycleView();
+                                    Toast.makeText(btnSync.getContext(), "Đồng bộ thành công", Toast.LENGTH_SHORT).show();
+                                    btnSync.setEnabled(true);
+                                    noOfRecord = 0; // reset counter
+                                    mp.start();
+                                }
                             }
                         }, new Response.ErrorListener() {
                             @Override
@@ -90,16 +101,6 @@ public class HistoryFragment extends Fragment {
                         queue.add(stringRequest);
                         Thread.sleep(2000);
                     }
-
-                    // Synced in local
-                    syncedAllAttendances();
-                    List<Attendance> attendances = databaseHandler.getAllAttendances();
-                    attendanceListAdapter = new AttendanceListAdapter(attendances);
-                    recyclerView.setHasFixedSize(true);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    recyclerView.setAdapter(attendanceListAdapter);
-
-                    Toast.makeText(btnSync.getContext(), "Đồng bộ thành công", Toast.LENGTH_SHORT).show();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     Toast.makeText(btnSync.getContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -108,13 +109,32 @@ public class HistoryFragment extends Fragment {
         });
     }
 
-    void syncedAllAttendances() {
+    private void renderRecycleView(){
         List<Attendance> attendances = databaseHandler.getAllAttendances();
-        if (attendances.size() == 0)
-            return;
+        List<Attendance> attendanceNotSynced = databaseHandler.getAttendancesHaveNotSyncedYet();
 
-        for (Attendance attendance : attendances) {
-            databaseHandler.updateAttendanceStatus(attendance, 1);
-        }
+        attendanceListAdapter = new AttendanceListAdapter(attendances);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(attendanceListAdapter);
+
+        tvHistory.setText("Tổng số lượng: " + attendances.size() + " - Chưa đồng bộ: " + attendanceNotSynced.size());
+    }
+
+    private void controlSyncButton(){
+        Boolean notBeSyncedYet = databaseHandler.checkHaveNonSyncedAttendance();
+        btnSync.setEnabled(notBeSyncedYet);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        renderRecycleView();
+        controlSyncButton();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 }

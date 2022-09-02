@@ -9,9 +9,11 @@
             android:id="@+id/tvItemInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:gravity="center_vertical"
+            android:textStyle="bold"
+            android:text="INFO"
+            android:textColor="@color/black"
             android:textSize="16sp"/>
 
     <TextView
@@ -21,14 +23,23 @@
             android:layout_toEndOf="@id/tvItemInfo"
             android:layout_toRightOf="@id/tvItemInfo"
             android:gravity="center_vertical"
+            android:text="NGÀY QUÉT"
+            android:textSize="14sp"/>
+
+    <TextView
+            android:id="@+id/tvItemType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center_vertical"
+            android:textStyle="bold"
+            android:text="CN"
             android:textSize="16sp"/>
 
     <TextView
             android:id="@+id/tvItemStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/tvItemScannedDate"
-            android:layout_toRightOf="@id/tvItemScannedDate"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
             android:text="Chưa đồng bộ"

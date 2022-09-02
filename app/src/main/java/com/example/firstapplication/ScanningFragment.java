@@ -1,8 +1,8 @@
 package com.example.firstapplication;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.*;
@@ -13,24 +13,26 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.entity.Attendance;
+import com.example.firstapplication.utils.Helper;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
+import java.util.Date;
 
 public class ScanningFragment extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION = 201;
-    private static Context mContext;
     SurfaceView surfaceView;
     TextView txtBarcodeValue;
     Button btnAction;
-    String intentData = "", sheetName = "";
+    String intentData = "", type = "";
     private View view;
     private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
     DatabaseHandler databaseHandler = null;
+    MediaPlayer mp = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,28 +41,15 @@ public class ScanningFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_scanning, container, false);
         initViews(view);
         initialiseDetectorsAndSources();
-        sheetName = getActivity().getIntent().getStringExtra("sheetName");
+        type = getActivity().getIntent().getStringExtra("sheetName");
         databaseHandler = new DatabaseHandler(getActivity());
-
+        mp = MediaPlayer.create(getContext(), R.raw.beep);
         return view;
     }
 
     public void initViews(View view) {
         txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
         surfaceView = view.findViewById(R.id.surfaceView);
-        btnAction = view.findViewById(R.id.btnAction);
-        btnAction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (intentData.length() > 0 & sheetName.length() > 0) {
-                    btnAction.setEnabled(false);
-                    Attendance attendance = new Attendance(intentData, sheetName);
-                    databaseHandler.addAttendance(attendance);
-                    Toast.makeText(getContext(), "Đã lưu", Toast.LENGTH_LONG).show();
-                    btnAction.setEnabled(true);
-                }
-            }
-        });
     }
 
     private void initialiseDetectorsAndSources() {
@@ -116,20 +105,31 @@ public class ScanningFragment extends Fragment {
                         public void run() {
                             intentData = barcodes.valueAt(0).displayValue;
                             txtBarcodeValue.setText(intentData);
+                            String id = intentData.split("_")[0];
+                            String date = Helper.getDateTime(new Date());
+                            Boolean isExisted = databaseHandler.checkAttendanceExist(type,
+                                    id, date);
+                            if(!isExisted && intentData.length() > 0 && type.length() > 0){
+                                Attendance attendance = new Attendance(intentData, type);
+                                databaseHandler.addAttendance(attendance);
+                                Toast.makeText(getContext(), "Lưu thành công", Toast.LENGTH_SHORT).show();
+                                mp.start();
+                            }
                         }
                     });
                 }
             }
         });
     }
-
     @Override
     public void onResume() {
         super.onResume();
+//        initialiseDetectorsAndSources();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+//        cameraSource.release();
     }
 }

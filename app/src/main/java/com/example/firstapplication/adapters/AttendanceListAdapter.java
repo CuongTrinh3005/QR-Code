@@ -32,6 +32,7 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceListAd
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         String info = attendanceList.get(position).getInfo();
         String scannedDate = attendanceList.get(position).getScannedDate();
+        String type = attendanceList.get(position).getType();
         String status = attendanceList.get(position).getSynced().toString();
         if ("true".equalsIgnoreCase(status)) {
             holder.tvStatus.setText("Đã đồng bộ");
@@ -40,6 +41,8 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceListAd
 
         holder.tvInfo.setText(info);
         holder.tvScannedDate.setText(scannedDate);
+
+        holder.tvType.setText("Loại quét: " + type);
 
         holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +60,7 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceListAd
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public RelativeLayout relativeLayout;
         private TextView tvInfo;
+        private TextView tvType;
         private TextView tvScannedDate;
         private TextView tvStatus;
 
@@ -65,6 +69,7 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceListAd
             relativeLayout = view.findViewById(R.id.relativeLayout);
             tvInfo = view.findViewById(R.id.tvItemInfo);
             tvScannedDate = view.findViewById(R.id.tvItemScannedDate);
+            tvType = view.findViewById(R.id.tvItemType);
             tvStatus = view.findViewById(R.id.tvItemStatus);
         }
     }

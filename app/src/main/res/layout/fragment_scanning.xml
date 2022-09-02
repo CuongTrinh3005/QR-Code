@@ -26,12 +26,5 @@
                 android:textColor="@android:color/white"
                 android:textSize="20sp"/>
 
-        <Button
-                android:id="@+id/btnAction"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#0000FF"
-                android:layout_marginTop="530dp"
-                android:text="@string/btn_label"/>
     </RelativeLayout>
 </FrameLayout>
