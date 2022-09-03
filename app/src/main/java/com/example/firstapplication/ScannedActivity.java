@@ -10,7 +10,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.firstapplication.adapters.ViewPageAdapter;
 import com.google.android.material.tabs.TabLayout;
 
-import static com.example.firstapplication.Helper.setActionBarBackGroundColor;
+import static com.example.firstapplication.utils.Helper.setActionBarBackGroundColor;
 
 public class ScannedActivity extends AppCompatActivity {
     private TabLayout tabLayout;

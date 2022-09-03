@@ -1,9 +1,22 @@
 package com.example.firstapplication.utils;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.BackgroundColorSpan;
+import androidx.appcompat.app.ActionBar;
+
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import static androidx.core.content.ContextCompat.getSystemService;
 
 public class Helper {
     public static final List<String> allowedDaysOfWeek = Arrays.asList("TUE", "THU", "SUN");
@@ -46,7 +59,7 @@ public class Helper {
         Integer minute = getMinuteFromTimestamp();
 
         if (((allowedDaysOfWeek.get(0).equalsIgnoreCase(dayOfWeek) || allowedDaysOfWeek.get(1).equalsIgnoreCase(dayOfWeek))
-                && hour == 9 && minute >= 0 && minute < 30))
+                && hour == 6 && minute >= 0 && minute < 30))
             return true;
 
         return false;
@@ -73,5 +86,22 @@ public class Helper {
             return true;
 
         return false;
+    }
+
+    public static void setActionBarBackGroundColor(ActionBar actionBar, String colorCode) {
+        ColorDrawable colorDrawable
+                = new ColorDrawable(Color.parseColor(colorCode));
+        actionBar.setBackgroundDrawable(colorDrawable);
+    }
+    public static Boolean validateQrCode(String content){
+        return Pattern.matches("[0-9]{5}_.+", content);
+    }
+
+    public static Boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager
+                = ((ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE));
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

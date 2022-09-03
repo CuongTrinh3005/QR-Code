@@ -6,7 +6,6 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.*;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
@@ -26,7 +25,6 @@ public class ScanningFragment extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION = 201;
     SurfaceView surfaceView;
     TextView txtBarcodeValue;
-    Button btnAction;
     String intentData = "", type = "";
     private View view;
     private BarcodeDetector barcodeDetector;
@@ -104,6 +102,9 @@ public class ScanningFragment extends Fragment {
                         @Override
                         public void run() {
                             intentData = barcodes.valueAt(0).displayValue;
+                            if(!Helper.validateQrCode(intentData))
+                                return;
+
                             txtBarcodeValue.setText(intentData);
                             String id = intentData.split("_")[0];
                             String date = Helper.getDateTime(new Date());
@@ -114,6 +115,7 @@ public class ScanningFragment extends Fragment {
                                 databaseHandler.addAttendance(attendance);
                                 Toast.makeText(getContext(), "Lưu thành công", Toast.LENGTH_SHORT).show();
                                 mp.start();
+                                txtBarcodeValue.setText("Vui lòng quét mã");
                             }
                         }
                     });

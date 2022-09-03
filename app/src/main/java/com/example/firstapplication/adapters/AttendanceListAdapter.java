@@ -57,6 +57,12 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceListAd
         return attendanceList.size();
     }
 
+    public void updateDataset(List<Attendance> newList){
+        this.attendanceList.clear();
+        this.attendanceList.addAll(newList);
+        notifyDataSetChanged();
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public RelativeLayout relativeLayout;
         private TextView tvInfo;

@@ -2,21 +2,25 @@ package com.example.firstapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.firstapplication.utils.Helper;
 
-import static com.example.firstapplication.Helper.setActionBarBackGroundColor;
+import static com.example.firstapplication.utils.Helper.setActionBarBackGroundColor;
 
 public class MainActivity extends AppCompatActivity {
     TextView txtTitle;
     Button btnTueThu;
     Button btnSunday;
     Button btnEarly;
+    Button btnOther;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         btnTueThu = findViewById(R.id.btnTueThu);
         btnSunday = findViewById(R.id.btnSunday);
         btnEarly = findViewById(R.id.btnEarly);
+        btnOther = findViewById(R.id.btnOther);
 
 //        Boolean tueThuAllowed = com.example.firstapplication.utils.Helper.checkTueAndThuAllowed();
 //        btnTueThu.setEnabled(tueThuAllowed);
@@ -69,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ScannedActivity.class);
-                intent.putExtra("sheetName", "CN");
+                intent.putExtra("sheetName", "GIAOLY");
                 startActivity(intent);
             }
         });
@@ -77,7 +82,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ScannedActivity.class);
-                intent.putExtra("sheetName", "DILESOM");
+                intent.putExtra("sheetName", "LESOM");
+                startActivity(intent);
+            }
+        });
+
+        btnOther.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ScannedActivity.class);
+                intent.putExtra("sheetName", "KHAC");
                 startActivity(intent);
             }
         });
