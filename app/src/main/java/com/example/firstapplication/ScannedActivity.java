@@ -23,10 +23,6 @@ public class ScannedActivity extends AppCompatActivity {
         initViews();
     }
 
-    public String getInfo() {
-        return getIntent().getStringExtra("sheetName");
-    }
-
     public void initViews() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);

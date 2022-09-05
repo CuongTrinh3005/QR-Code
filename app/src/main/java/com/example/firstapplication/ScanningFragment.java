@@ -17,6 +17,7 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.google.android.material.tabs.TabLayout;
 
 import java.io.IOException;
 import java.util.Date;
@@ -48,6 +49,10 @@ public class ScanningFragment extends Fragment {
     public void initViews(View view) {
         txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
         surfaceView = view.findViewById(R.id.surfaceView);
+        if("sync".equalsIgnoreCase(getActivity().getIntent().getStringExtra("action"))) {
+            TabLayout tabhost = (TabLayout) getActivity().findViewById(R.id.tabLayout);
+            tabhost.getTabAt(1).select();
+        }
     }
 
     private void initialiseDetectorsAndSources() {
