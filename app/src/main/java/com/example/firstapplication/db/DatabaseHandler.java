@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.example.firstapplication.entity.Attendance;
+import com.example.firstapplication.entity.Scanner;
 import com.example.firstapplication.utils.Helper;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "attendanceChecking";
     private static final String TABLE_ATTENDANCES = "attendances";
     private static final String KEY_ID = "id";
@@ -21,6 +22,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_TYPE = "type";
     private static final String KEY_SCANNED_DATE = "scannedDate";
     private static final String KEY_IS_SYNCED = "isSynced";
+    private static final String KEY_SCANNED_BY = "scanned_by";
+
+    private static final String TABLE_SCANNERS = "scanners";
+    private static final String KEY_GOOGLE_ID = "google_id";
+    private static final String KEY_DISPLAY_NAME = "display_name";
+    private static final String KEY_EMAIL = "email";
+
+    private final String CREATE_SCANNERS_TABLE = "CREATE TABLE " + TABLE_SCANNERS + "("
+            + KEY_GOOGLE_ID + " TEXT PRIMARY KEY, " + KEY_DISPLAY_NAME + " TEXT, "
+            + KEY_EMAIL + " TEXT "
+            + ")";
+
+    private final String CREATE_ATTENDANCES_TABLE = "CREATE TABLE " + TABLE_ATTENDANCES + "("
+            + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + KEY_INFO + " TEXT, "
+            + KEY_TYPE + " TEXT, " + KEY_SCANNED_DATE + " TEXT, "
+            + KEY_IS_SYNCED + " INTEGER DEFAULT 0, "
+            + KEY_SCANNED_BY + " TEXT"
+            + ")";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -29,18 +48,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_ATTENDANCES + "("
-                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + KEY_INFO + " TEXT, "
-                + KEY_TYPE + " TEXT, " + KEY_SCANNED_DATE + " TEXT, "
-                + KEY_IS_SYNCED + " INTEGER DEFAULT 0"
-                + ")";
-        db.execSQL(CREATE_CONTACTS_TABLE);
+        db.execSQL(CREATE_SCANNERS_TABLE);
+        db.execSQL(CREATE_ATTENDANCES_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTENDANCES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SCANNERS);
 
         // Create tables again
         onCreate(db);
@@ -162,5 +178,44 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst())
             return true;
         return false;
+    }
+
+    public Boolean checkHaveGoogleAccount(){
+        // Select All Query
+        try{
+            String selectQuery = "SELECT * FROM " + TABLE_SCANNERS;
+            SQLiteDatabase db = this.getWritableDatabase();
+            Cursor cursor = db.rawQuery(selectQuery, null);
+            if(cursor.moveToFirst())
+                return true;
+            return false;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public void addScanner(Scanner scanner) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_GOOGLE_ID, scanner.getGoogleId());
+        values.put(KEY_DISPLAY_NAME, scanner.getDisplayName());
+        values.put(KEY_EMAIL, scanner.getEmail());
+
+        db.insert(TABLE_SCANNERS, null, values);
+        //2nd argument is String containing nullColumnHack
+        db.close(); // Closing database connection
+    }
+
+    public String getScannerName() {
+        String selectQuery = "SELECT * FROM " + TABLE_SCANNERS;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        String name = "";
+        if(cursor.moveToFirst())
+            name = cursor.getString(1);
+        return name;
     }
 }

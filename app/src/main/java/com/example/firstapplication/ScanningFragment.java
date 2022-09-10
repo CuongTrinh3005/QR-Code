@@ -120,7 +120,6 @@ public class ScanningFragment extends Fragment {
                                 databaseHandler.addAttendance(attendance);
                                 Toast.makeText(getContext(), "Lưu thành công", Toast.LENGTH_SHORT).show();
                                 mp.start();
-                                txtBarcodeValue.setText("Vui lòng quét mã");
                             }
                         }
                     });
