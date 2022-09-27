@@ -110,7 +110,11 @@ public class ScanningFragment extends Fragment {
                             if(!Helper.validateQrCode(intentData))
                                 return;
 
-                            txtBarcodeValue.setText(intentData);
+                            // Get 2 last names
+                            String[] names = intentData.split("_");
+                            String displayName = names[names.length-2] + " " + names[names.length-1];
+
+                            txtBarcodeValue.setText(displayName);
                             String id = intentData.split("_")[0];
                             String date = Helper.getDateTime(new Date());
                             Boolean isExisted = databaseHandler.checkAttendanceExist(type,
@@ -118,7 +122,16 @@ public class ScanningFragment extends Fragment {
                             if(!isExisted && intentData.length() > 0 && type.length() > 0){
                                 Attendance attendance = new Attendance(intentData, type);
                                 databaseHandler.addAttendance(attendance);
-                                Toast.makeText(getContext(), "Lưu thành công", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Lưu mới thành công", Toast.LENGTH_SHORT).show();
+                                mp.start();
+                            }
+                            else if(isExisted && intentData.length() > 0 && type.length() > 0){
+                                try {
+                                    Thread.sleep(100);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+//                                Toast.makeText(getContext(), "Đã lưu", Toast.LENGTH_SHORT).show();
                                 mp.start();
                             }
                         }

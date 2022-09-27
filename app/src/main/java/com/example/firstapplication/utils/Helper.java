@@ -5,9 +5,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.BackgroundColorSpan;
 import androidx.appcompat.app.ActionBar;
 
 import java.text.SimpleDateFormat;
@@ -15,8 +12,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import static androidx.core.content.ContextCompat.getSystemService;
 
 public class Helper {
     public static final List<String> allowedDaysOfWeek = Arrays.asList("TUE", "THU", "SUN");
