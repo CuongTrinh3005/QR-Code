@@ -167,10 +167,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public Boolean checkAttendanceExist(String type, String id, String date){
+        String dateToQuery = date.split(" ")[0];
         String selectQuery = "SELECT * FROM " + TABLE_ATTENDANCES
                 + " WHERE " + KEY_INFO + " LIKE " + "'" + id.trim() + "%'"
                 + " AND " + KEY_TYPE + " = " +  "'"  + type + "'"
-                + " AND " + KEY_SCANNED_DATE + " = " + "'" + date + "'"
+                + " AND " + KEY_SCANNED_DATE + " LIKE " + "'" + dateToQuery + "%'"
                 + " ORDER BY " + KEY_ID + " DESC";
 
         SQLiteDatabase db = this.getWritableDatabase();

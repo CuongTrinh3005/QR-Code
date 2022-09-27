@@ -22,7 +22,7 @@ public class Helper {
     public static final List<String> allowedDaysOfWeek = Arrays.asList("TUE", "THU", "SUN");
 
     public static String getDateTime(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         return formatter.format(date);
     }
 
