@@ -11,7 +11,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,13 +24,19 @@ import com.example.firstapplication.adapters.AttendanceListAdapter;
 import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.entity.Attendance;
 import com.example.firstapplication.entity.Scanner;
+import com.example.firstapplication.utils.ApiUtils;
 import com.example.firstapplication.utils.Helper;
+import com.example.firstapplication.utils.VolleyCallback;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +54,8 @@ public class HistoryFragment extends Fragment {
     MediaPlayer mp = null;
     private Integer noOfRecord = 0;
     ProgressDialog progressBar;
+    GoogleSignInClient signInClient;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -59,6 +69,8 @@ public class HistoryFragment extends Fragment {
         String scannedBy = "Người quét: " + scannerName;
         if(!"".equals(scannerName))
             Toast.makeText(getContext(), scannedBy, Toast.LENGTH_SHORT).show();
+
+        databaseHandler.addAttendance(new Attendance("test", "T3T5"));
 
         return view;
     }
@@ -177,7 +189,7 @@ public class HistoryFragment extends Fragment {
     private void authenticate(){
         GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().build();
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(getContext(), signInOptions);
+        signInClient = GoogleSignIn.getClient(getContext(), signInOptions);
         signIn(signInClient);
         btnSync.setEnabled(false);
     }
@@ -187,19 +199,56 @@ public class HistoryFragment extends Fragment {
         startActivityForResult(signinIntent, 1000);
     }
 
+    private void logOut(){
+        signInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                getActivity().finish();
+            }
+        });
+    }
+
     private Boolean saveScannerInfo(){
         try{
             GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
             if(account!=null){
                 String googleId = account.getId();
                 String displayName = account.getDisplayName();
-                String email = account.getEmail();
-                Scanner scanner = new Scanner(googleId, displayName, email);
-                databaseHandler.addScanner(scanner);
+                String signedInEmail = account.getEmail();
+                String url = "https://script.google.com/macros/s/AKfycbyWOtmVYxqViQj5ouhKXomrHs-yPYDlnrifE2g0wKYXZdN4_m78ttzzrNt8M7jomE2q/exec?action=getItems&sheetName=EMAIL"; //just a string
+                ApiUtils utils = new ApiUtils();
+                utils.getAllowedEmails(url, (AppCompatActivity) getActivity(), new VolleyCallback() {
+                    @Override
+                    public void onSuccess(String result) {
+                        Boolean isMatching = false;
+                        try {
+                            JSONObject items = new JSONObject(result);
+                            JSONArray permittedEmailListJson = items.getJSONArray("items");
+                            for(int index=0; index<permittedEmailListJson.length(); index++){
+                                JSONObject allowedEntity = permittedEmailListJson.getJSONObject(index);
+                                String email = allowedEntity.getString("email").trim();
+                                if(email.equalsIgnoreCase(signedInEmail)) {
+                                    isMatching = true;
+                                    Scanner scanner = new Scanner(googleId, displayName, signedInEmail);
+                                    databaseHandler.addScanner(scanner);
 
-                String welcome = "Xin chào, " + displayName;
-                Toast.makeText(getContext(), welcome, Toast.LENGTH_SHORT).show();
-                btnSync.setEnabled(true);
+                                    String welcome = "Xin chào, " + displayName;
+                                    Toast.makeText(getContext(), welcome, Toast.LENGTH_SHORT).show();
+                                    btnSync.setEnabled(true);
+                                    break;
+                                }
+                            }
+                            if(!isMatching){
+                                logOut();
+                                getActivity().finish();
+                                Toast.makeText(getContext(), "Tài khoản chưa đăng ký với admin!", Toast.LENGTH_SHORT).show();
+                                throw new RuntimeException("Email chưa được đăng ký với admin!");
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
                 return true;
             }
             return false;
@@ -209,7 +258,6 @@ public class HistoryFragment extends Fragment {
             return false;
         }
     }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
