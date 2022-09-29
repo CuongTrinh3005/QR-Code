@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
                     switch (which){
                         case DialogInterface.BUTTON_POSITIVE:
                             //Yes button clicked
-                            Toast.makeText(MainActivity.this, "Going to sync data", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(MainActivity.this, ScannedActivity.class);
                             intent.putExtra("action", "sync");
                             startActivity(intent);
@@ -50,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
                         case DialogInterface.BUTTON_NEGATIVE:
                             //No button clicked
-                            Toast.makeText(MainActivity.this, "Syncing data later", Toast.LENGTH_SHORT).show();
                             break;
                     }
                 }

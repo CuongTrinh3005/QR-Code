@@ -41,6 +41,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class HistoryFragment extends Fragment {
     String URL = "https://script.google.com/macros/s/AKfycbyWOtmVYxqViQj5ouhKXomrHs-yPYDlnrifE2g0wKYXZdN4_m78ttzzrNt8M7jomE2q/exec";
@@ -70,7 +71,7 @@ public class HistoryFragment extends Fragment {
         if(!"".equals(scannerName))
             Toast.makeText(getContext(), scannedBy, Toast.LENGTH_SHORT).show();
 
-        databaseHandler.addAttendance(new Attendance("test", "T3T5"));
+        databaseHandler.addAttendance(new Attendance("test", "KHAC"));
 
         return view;
     }
@@ -189,7 +190,7 @@ public class HistoryFragment extends Fragment {
     private void authenticate(){
         GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().build();
-        signInClient = GoogleSignIn.getClient(getContext(), signInOptions);
+        signInClient = GoogleSignIn.getClient(Objects.requireNonNull(getContext()), signInOptions);
         signIn(signInClient);
         btnSync.setEnabled(false);
     }
@@ -228,21 +229,20 @@ public class HistoryFragment extends Fragment {
                                 JSONObject allowedEntity = permittedEmailListJson.getJSONObject(index);
                                 String email = allowedEntity.getString("email").trim();
                                 if(email.equalsIgnoreCase(signedInEmail)) {
+                                    btnSync.setEnabled(false);
                                     isMatching = true;
                                     Scanner scanner = new Scanner(googleId, displayName, signedInEmail);
                                     databaseHandler.addScanner(scanner);
 
                                     String welcome = "Xin chào, " + displayName;
                                     Toast.makeText(getContext(), welcome, Toast.LENGTH_SHORT).show();
-                                    btnSync.setEnabled(true);
+                                    btnSync.performClick();
                                     break;
                                 }
                             }
                             if(!isMatching){
                                 logOut();
-                                getActivity().finish();
                                 Toast.makeText(getContext(), "Tài khoản chưa đăng ký với admin!", Toast.LENGTH_SHORT).show();
-                                throw new RuntimeException("Email chưa được đăng ký với admin!");
                             }
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
