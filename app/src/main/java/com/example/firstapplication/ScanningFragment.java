@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.SparseArray;
 import android.view.*;
 import android.widget.TextView;
@@ -21,6 +23,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Objects;
 
 public class ScanningFragment extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION = 201;
@@ -30,6 +33,7 @@ public class ScanningFragment extends Fragment {
     private View view;
     private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
+    private Boolean cameraSourceStarted=false;
     DatabaseHandler databaseHandler = null;
     MediaPlayer mp = null;
 
@@ -78,6 +82,7 @@ public class ScanningFragment extends Fragment {
                         ActivityCompat.requestPermissions(getActivity(), new
                                 String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                     }
+                    cameraSourceStarted = true;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -131,7 +136,6 @@ public class ScanningFragment extends Fragment {
                                 } catch (InterruptedException e) {
                                     throw new RuntimeException(e);
                                 }
-//                                Toast.makeText(getContext(), "Đã lưu", Toast.LENGTH_SHORT).show();
                                 mp.start();
                             }
                         }
@@ -143,12 +147,33 @@ public class ScanningFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-//        initialiseDetectorsAndSources();
+        initialiseDetectorsAndSources();
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!cameraSourceStarted) {
+                    try {
+                        if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.CAMERA)
+                                == PackageManager.PERMISSION_GRANTED) {
+                            cameraSource.start(surfaceView.getHolder());
+                        } else {
+                            ActivityCompat.requestPermissions(getActivity(), new
+                                    String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, 500);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-//        cameraSource.release();
+        cameraSource.release();
+        cameraSourceStarted = false;
     }
 }
