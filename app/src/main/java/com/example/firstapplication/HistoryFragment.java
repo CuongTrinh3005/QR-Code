@@ -71,8 +71,6 @@ public class HistoryFragment extends Fragment {
         if(!"".equals(scannerName))
             Toast.makeText(getContext(), scannedBy, Toast.LENGTH_SHORT).show();
 
-        databaseHandler.addAttendance(new Attendance("test", "KHAC"));
-
         return view;
     }
 
@@ -151,13 +149,13 @@ public class HistoryFragment extends Fragment {
                                         return params;
                                     }
                                 };
-                                int socketTimeout = 50000;
+                                int socketTimeout = 300000;
 
-                                RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                                RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0,
+                                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
                                 stringRequest.setRetryPolicy(retryPolicy);
                                 queue = Volley.newRequestQueue(getContext());
                                 queue.add(stringRequest);
-                                Thread.sleep(2000);
                             }
                         } catch (Exception ex) {
                             ex.printStackTrace();

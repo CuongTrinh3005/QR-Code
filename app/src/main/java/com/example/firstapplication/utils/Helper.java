@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class Helper {
-    public static final List<String> allowedDaysOfWeek = Arrays.asList("TUE", "THU", "SUN");
+    public static final List<String> allowedDaysOfWeek = Arrays.asList("MON", "TUE", "WED", "THU", "FRI", "SUN");
 
     public static String getDateTime(Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -22,14 +22,17 @@ public class Helper {
     }
 
     public static String convertDateToString(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
+        SimpleDateFormat formatter = new SimpleDateFormat("E dd-MMM-yyyy HH:mm:ss");
         return formatter.format(date);
     }
 
     public static String getTimestampFromDate(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-        String dateString = formatter.format(date);
-        return dateString.split(" ")[1];
+//        SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+//        String dateString = formatter.format(date);
+//        return dateString.split(" ")[1];
+        String dataStr = convertDateToString(date);
+        String timestamp = dataStr.split(" ")[2];
+        return timestamp;
     }
 
     public static Integer getHourFromTimestamp() {
@@ -44,40 +47,65 @@ public class Helper {
 
     public static String getDayOfWeek(Date date) {
         String dateString = convertDateToString(date);
-        return dateString.split(",")[0];
+        return dateString.split(" ")[0];
     }
 
     public static Boolean checkTueAndThuAllowed() {
         Date date = new Date();
         String dayOfWeek = getDayOfWeek(date);
-        Integer hour = getHourFromTimestamp();
-        Integer minute = getMinuteFromTimestamp();
+        int hour = getHourFromTimestamp(), minute = getMinuteFromTimestamp();
 
-        if (((allowedDaysOfWeek.get(0).equalsIgnoreCase(dayOfWeek) || allowedDaysOfWeek.get(1).equalsIgnoreCase(dayOfWeek))
-                && hour == 6 && minute >= 0 && minute < 30))
-            return true;
-
-        return false;
+        if (allowedDaysOfWeek.get(1).equalsIgnoreCase(dayOfWeek) || allowedDaysOfWeek.get(3).equalsIgnoreCase(dayOfWeek)){
+            if((hour == 4  && minute >= 30) || (hour == 5 && minute <= 30)){
+                return true;
+            }
+            else if((hour == 18 && minute >= 30) || (hour == 19 && minute == 0)){
+                return true;
+            }
+            else return false;
+        }
+        else{
+            return false;
+        }
     }
 
     public static Boolean checkSundayEarlyAllowed() {
         Date date = new Date();
         String dayOfWeek = getDayOfWeek(date);
-        Integer hour = getHourFromTimestamp();
-        Integer minute = getMinuteFromTimestamp();
+        int hour = getHourFromTimestamp(), minute = getMinuteFromTimestamp();
 
-        if ((allowedDaysOfWeek.get(2).equalsIgnoreCase(dayOfWeek) && hour == 6 && minute >= 0 && minute < 30))
+        if ((allowedDaysOfWeek.get(5).equalsIgnoreCase(dayOfWeek) && hour == 6 && minute >= 0 && minute <= 30))
             return true;
 
         return false;
     }
 
+    public static Boolean checkOtherDaysAllowed() {
+        Date date = new Date();
+        String dayOfWeek = getDayOfWeek(date);
+        int hour = getHourFromTimestamp(), minute = getMinuteFromTimestamp();
+
+        if (allowedDaysOfWeek.get(0).equalsIgnoreCase(dayOfWeek) || allowedDaysOfWeek.get(2).equalsIgnoreCase(dayOfWeek)
+                || allowedDaysOfWeek.get(4).equalsIgnoreCase(dayOfWeek)){
+            if((hour == 4  && minute >= 30) || (hour == 5 && minute <= 30)){
+                return true;
+            }
+            else if((hour == 18 && minute >= 30) || (hour == 19 && minute == 0)){
+                return true;
+            }
+            else return false;
+        }
+        else{
+            return false;
+        }
+    }
+
     public static Boolean checkSundayAllowed() {
         Date date = new Date();
         String dayOfWeek = getDayOfWeek(date);
-        Integer hour = getHourFromTimestamp();
+        int hour = getHourFromTimestamp(), minute = getMinuteFromTimestamp();
 
-        if ((allowedDaysOfWeek.get(2).equalsIgnoreCase(dayOfWeek) && hour >= 7 && hour <= 8))
+        if ((allowedDaysOfWeek.get(5).equalsIgnoreCase(dayOfWeek) && (hour == 7 || (hour == 8 && minute <= 30))))
             return true;
 
         return false;

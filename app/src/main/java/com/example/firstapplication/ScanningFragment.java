@@ -60,8 +60,6 @@ public class ScanningFragment extends Fragment {
     }
 
     private void initialiseDetectorsAndSources() {
-
-        Toast.makeText(getContext(), "Sẵn sàng quét", Toast.LENGTH_SHORT).show();
         barcodeDetector = new BarcodeDetector.Builder(getContext())
                 .setBarcodeFormats(Barcode.QR_CODE)
                 .build();
@@ -83,6 +81,7 @@ public class ScanningFragment extends Fragment {
                                 String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                     }
                     cameraSourceStarted = true;
+                    Toast.makeText(getContext(), "Sẵn sàng quét", Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -161,7 +160,6 @@ public class ScanningFragment extends Fragment {
                             ActivityCompat.requestPermissions(getActivity(), new
                                     String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                         }
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

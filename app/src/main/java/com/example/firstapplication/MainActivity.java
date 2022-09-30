@@ -80,14 +80,17 @@ public class MainActivity extends AppCompatActivity {
         btnEarly = findViewById(R.id.btnEarly);
         btnOther = findViewById(R.id.btnOther);
 
-//        Boolean tueThuAllowed = com.example.firstapplication.utils.Helper.checkTueAndThuAllowed();
-//        btnTueThu.setEnabled(tueThuAllowed);
-//
-//        Boolean sundayAllowed = com.example.firstapplication.utils.Helper.checkSundayAllowed();
-//        btnSunday.setEnabled(sundayAllowed);
-//
-//        Boolean sundayEarlyAllowed = com.example.firstapplication.utils.Helper.checkSundayEarlyAllowed();
-//        btnEarly.setEnabled(sundayEarlyAllowed);
+        Boolean tueThuAllowed = com.example.firstapplication.utils.Helper.checkTueAndThuAllowed();
+        btnTueThu.setEnabled(tueThuAllowed);
+
+        Boolean sundayAllowed = com.example.firstapplication.utils.Helper.checkSundayAllowed();
+        btnSunday.setEnabled(sundayAllowed);
+
+        Boolean sundayEarlyAllowed = com.example.firstapplication.utils.Helper.checkSundayEarlyAllowed();
+        btnEarly.setEnabled(sundayEarlyAllowed);
+
+        Boolean otherAllowed = com.example.firstapplication.utils.Helper.checkOtherDaysAllowed();
+        btnOther.setEnabled(otherAllowed);
     }
 
     private void setEvents() {
@@ -130,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        initViews();
         processSyncing();
     }
 }
