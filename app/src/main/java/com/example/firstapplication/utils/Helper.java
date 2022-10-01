@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class Helper {
@@ -22,7 +23,7 @@ public class Helper {
     }
 
     public static String convertDateToString(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("E dd-MMM-yyyy HH:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("E dd-MM-yyyy HH:mm:ss");
         return formatter.format(date);
     }
 
@@ -126,5 +127,49 @@ public class Helper {
                 .getSystemService(Context.CONNECTIVITY_SERVICE));
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    public static String getCurrentTimeDisplay(){
+        String currentDate = convertDateToString(new Date());
+        String dayOfWeek = getDayOfWeek(new Date());
+        String displayDate = "";
+        switch (dayOfWeek){
+            case "Mon":{
+                displayDate = "Thứ Hai, " + currentDate.substring(3);
+                break;
+            }
+            case "Tue":{
+                displayDate = "Thứ Ba, " + currentDate.substring(3);
+                break;
+            }
+            case "Wed":{
+                displayDate = "Thứ Tư, " + currentDate.substring(3);
+                break;
+            }
+            case "Thu":{
+                displayDate = "Thứ Năm, " + currentDate.substring(3);
+                break;
+            }
+            case "Fri":{
+                displayDate = "Thứ Sáu, " + currentDate.substring(3);
+                break;
+            }
+            case "Sat":{
+                displayDate = "Thứ Bảy, " + currentDate.substring(3);
+                break;
+            }
+            case "Sun":{
+                displayDate = "Chúa Nhật, " + currentDate.substring(3);
+                break;
+            }
+            default:
+                break;
+        }
+//        currentDate.replace("Mon", "Thứ Hai, ").replace("Tue", "Thứ Ba, ")
+//                .replace("Wed", "Thứ Tư, ").replace("Thu", "Thứ Năm, ")
+//                .replace("Fri", "Thứ Sáu, ").replace("Sat", "Thứ Bảy, ")
+//                .replace("Sun", "Chúa Nhật, ");
+
+        return displayDate;
     }
 }

@@ -81,7 +81,6 @@ public class ScanningFragment extends Fragment {
                                 String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                     }
                     cameraSourceStarted = true;
-                    Toast.makeText(getContext(), "Sẵn sàng quét", Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

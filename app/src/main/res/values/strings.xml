@@ -3,4 +3,8 @@
     <string name="btn_label">THỰC HIỆN LƯU</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_title">QUẢN LÝ ĐIỂM DANH</string>
+    <string name="church_name">GX. THÁNH GIUSE</string>
+    <string name="current_date">Thứ Bảy, 01-10-2022 10:42:12</string>
+    <string name="time_not_allowed">Ngoài khung giờ quét</string>
 </resources>
