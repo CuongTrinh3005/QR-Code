@@ -1,6 +1,7 @@
 package com.example.firstapplication;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -53,7 +54,7 @@ public class HistoryFragment extends Fragment {
     private AttendanceListAdapter attendanceListAdapter = null;
     private RequestQueue queue;
     MediaPlayer mp = null;
-    private Integer noOfRecord = 0;
+    private Integer startIndex = 0;
     ProgressDialog progressBar;
     GoogleSignInClient signInClient;
 
@@ -117,46 +118,42 @@ public class HistoryFragment extends Fragment {
                     public void run() {
                         try {
                             List<Attendance> attendancesPreSynced = databaseHandler.getAttendancesHaveNotSyncedYet();
-                            for (Attendance attendancePreSynced : attendancesPreSynced) {
-                                StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-                                    @Override
-                                    public void onResponse(String response) {
-                                        databaseHandler.updateAttendanceStatus(attendancePreSynced, 1);
-                                        noOfRecord++;
-                                        if (noOfRecord == attendancesPreSynced.size()) {
-                                            renderRecycleView(1);
-                                            Toast.makeText(btnSync.getContext(), "Đồng bộ thành công", Toast.LENGTH_SHORT).show();
-                                            noOfRecord = 0; // reset counter
-                                            mp.start();
-                                            progressBar.dismiss();
-                                        }
-                                    }
-                                }, new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        Log.d("error", error.toString());
-                                    }
-                                }) {
-                                    @Override
-                                    protected Map<String, String> getParams() {
-                                        Map<String, String> params = new HashMap<>();
-                                        params.put("action", "addItem");
-                                        params.put("sheetName", attendancePreSynced.getType());
-                                        params.put("info", attendancePreSynced.getInfo());
-                                        params.put("scannedDate", attendancePreSynced.getScannedDate());
-                                        params.put("scannedBy", databaseHandler.getScannerName());
+                            Context context = getContext();
+                            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    databaseHandler.updateAttendanceStatus(attendancesPreSynced.get(startIndex), 1);
+                                    int nextIndex = startIndex+1;
+                                    postSpecificRecordInList(attendancesPreSynced, nextIndex, context, databaseHandler.getScannerName());
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.d("error", error.toString());
+                                    Toast.makeText(getContext(),
+                                            "Đã có lỗi, vui lòng thử lại: " + error.toString(),
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }) {
+                                @Override
+                                protected Map<String, String> getParams() {
+                                    Map<String, String> params = new HashMap<>();
+                                    params.put("action", "addItem");
+                                    params.put("sheetName", attendancesPreSynced.get(startIndex).getType());
+                                    params.put("info", attendancesPreSynced.get(startIndex).getInfo());
+                                    params.put("scannedDate", attendancesPreSynced.get(startIndex).getScannedDate());
+                                    params.put("scannedBy", databaseHandler.getScannerName());
 
-                                        return params;
-                                    }
-                                };
-                                int socketTimeout = 300000;
+                                    return params;
+                                }
+                            };
+                            int socketTimeout = 300000;
 
-                                RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0,
-                                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-                                stringRequest.setRetryPolicy(retryPolicy);
-                                queue = Volley.newRequestQueue(getContext());
-                                queue.add(stringRequest);
-                            }
+                            RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0,
+                                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                            stringRequest.setRetryPolicy(retryPolicy);
+                            queue = Volley.newRequestQueue(context);
+                            queue.add(stringRequest);
                         } catch (Exception ex) {
                             ex.printStackTrace();
                             Toast.makeText(btnSync.getContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -165,6 +162,50 @@ public class HistoryFragment extends Fragment {
                 }).start();
             }
         });
+    }
+
+    private void postSpecificRecordInList(List<Attendance> attendancesPreSynced, int index, Context context, String scannerName){
+        Attendance attendancePreSynced = attendancesPreSynced.get(index);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                databaseHandler.updateAttendanceStatus(attendancePreSynced, 1);
+                if(index<attendancesPreSynced.size()-1){
+                    int nextIndex = index+1;
+                    postSpecificRecordInList(attendancesPreSynced, nextIndex, context, scannerName);
+                }
+                else{
+                    renderRecycleView(1);
+                    Toast.makeText(btnSync.getContext(), "Đồng bộ thành công", Toast.LENGTH_SHORT).show();
+                    mp.start();
+                    progressBar.dismiss();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("error", error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("action", "addItem");
+                params.put("sheetName", attendancePreSynced.getType());
+                params.put("info", attendancePreSynced.getInfo());
+                params.put("scannedDate", attendancePreSynced.getScannedDate());
+                params.put("scannedBy", scannerName);
+
+                return params;
+            }
+        };
+        int socketTimeout = 300000;
+
+        RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        stringRequest.setRetryPolicy(retryPolicy);
+        queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
     }
 
     private void renderRecycleView(int option){
