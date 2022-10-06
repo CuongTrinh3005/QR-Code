@@ -69,11 +69,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        switch (item.getItemId()) {
-//            case android.R.id.home:
-//                this.finish();
-//                return true;
-//        }
         if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -119,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements
 
         if (id == R.id.nav_account) {
             Toast.makeText(this, "Account", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_sync) {
             Intent intent = new Intent(MainActivity.this, SeparateSyncActivity.class);
             startActivity(intent);

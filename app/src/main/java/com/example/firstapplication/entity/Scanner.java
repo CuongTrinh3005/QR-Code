@@ -4,11 +4,19 @@ public class Scanner {
     private String googleId;
     private String displayName;
     private String email;
+    private String imageUrl;
 
     public Scanner(String googleId, String displayName, String email) {
         this.googleId = googleId;
         this.displayName = displayName;
         this.email = email;
+    }
+
+    public Scanner(String googleId, String displayName, String email, String imageUrl) {
+        this.googleId = googleId;
+        this.displayName = displayName;
+        this.email = email;
+        this.imageUrl = imageUrl;
     }
 
     public String getGoogleId() {
@@ -33,5 +41,13 @@ public class Scanner {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
