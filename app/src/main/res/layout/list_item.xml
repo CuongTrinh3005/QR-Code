@@ -20,12 +20,14 @@
             android:id="@+id/tvItemScannedDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/tvItemInfo"
-            android:layout_toRightOf="@id/tvItemInfo"
             android:gravity="center_vertical"
             android:text="NGÀY QUÉT"
-            android:textSize="14sp"/>
-
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:layout_marginEnd="4dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="14dp"/>
     <TextView
             android:id="@+id/tvItemType"
             android:layout_width="wrap_content"

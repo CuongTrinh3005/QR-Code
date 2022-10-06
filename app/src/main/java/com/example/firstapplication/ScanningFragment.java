@@ -44,7 +44,7 @@ public class ScanningFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_scanning, container, false);
         initViews(view);
         initialiseDetectorsAndSources();
-        type = getActivity().getIntent().getStringExtra("sheetName");
+        type = Objects.requireNonNull(getActivity()).getIntent().getStringExtra("sheetName");
         databaseHandler = new DatabaseHandler(getActivity());
         mp = MediaPlayer.create(getContext(), R.raw.beep);
         return view;
@@ -53,10 +53,6 @@ public class ScanningFragment extends Fragment {
     public void initViews(View view) {
         txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
         surfaceView = view.findViewById(R.id.surfaceView);
-        if("sync".equalsIgnoreCase(getActivity().getIntent().getStringExtra("action"))) {
-            TabLayout tabhost = (TabLayout) getActivity().findViewById(R.id.tabLayout);
-            tabhost.getTabAt(1).select();
-        }
     }
 
     private void initialiseDetectorsAndSources() {

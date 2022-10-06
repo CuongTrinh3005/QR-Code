@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.firstapplication.db.DatabaseHandler;
-import com.example.firstapplication.entity.Attendance;
 import com.example.firstapplication.utils.Helper;
 
 import static com.example.firstapplication.utils.Helper.setActionBarBackGroundColor;
@@ -31,8 +30,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        for(int i=0; i<5; i++)
-            databaseHandler.addAttendance(new Attendance("email_testing", "KHAC"));
         initViews();
         setEvents();
         processSyncing();
@@ -47,9 +44,7 @@ public class MainActivity extends AppCompatActivity {
                     switch (which){
                         case DialogInterface.BUTTON_POSITIVE:
                             //Yes button clicked
-//                            Intent intent = new Intent(MainActivity.this, ScannedActivity.class);
                             Intent intent = new Intent(MainActivity.this, SeparateSyncActivity.class);
-//                            intent.putExtra("action", "sync");
                             startActivity(intent);
                             break;
 

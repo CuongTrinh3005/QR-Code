@@ -6,4 +6,5 @@
     <string name="church_name">GX. THÁNH GIUSE</string>
     <string name="current_date">Thứ Bảy, 01-10-2022 10:42:12</string>
     <string name="time_not_allowed">Ngoài khung giờ quét</string>
+    <string name="sync_action">ĐỒNG BỘ</string>
 </resources>
