@@ -9,14 +9,20 @@ import android.view.*;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.utils.Helper;
+import com.google.android.material.navigation.NavigationView;
 
 import static com.example.firstapplication.utils.Helper.setActionBarBackGroundColor;
 
-public class MainActivity extends AppCompatActivity {
-    private RelativeLayout relativeLayout;
+public class MainActivity extends AppCompatActivity implements
+        NavigationView.OnNavigationItemSelectedListener{
+    public DrawerLayout drawerLayout;
+    public ActionBarDrawerToggle actionBarDrawerToggle;
+
     private PopupWindow popupWindow;
     TextView txtCurrentDate;
     ImageView imageView;
@@ -63,13 +69,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                return true;
+//        switch (item.getItemId()) {
+//            case android.R.id.home:
+//                this.finish();
+//                return true;
+//        }
+        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     private void initViews() {
         ActionBar actionBar = getSupportActionBar();
@@ -77,11 +87,46 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         setActionBarBackGroundColor(actionBar, "#000000");
 
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.navigationView);
+
+        if (mNavigationView != null) {
+            mNavigationView.setNavigationItemSelectedListener(this);
+        }
+
+        // drawer layout instance to toggle the menu icon to open
+        // drawer and back button to close drawer
+        drawerLayout = findViewById(R.id.my_drawer_layout);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
+
+        // pass the Open and Close toggle for the drawer layout listener
+        // to toggle the button
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+
+        // to make the Navigation drawer icon always appear on the action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         imageView = findViewById(R.id.logo);
         imageView.setBackgroundResource(R.drawable.giuse_church);
 
         txtCurrentDate = findViewById(R.id.currentDate);
         txtCurrentDate.setText(Helper.getCurrentTimeDisplay());
+    }
+
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_account) {
+            Toast.makeText(this, "Account", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.nav_sync) {
+            Intent intent = new Intent(MainActivity.this, SeparateSyncActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_exit) {
+            this.finish();
+        }
+
+        return true;
     }
 
     @SuppressLint("ResourceType")

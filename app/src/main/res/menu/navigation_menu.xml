@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:ignore="HardcodedText">
+
+    <item
+            android:icon="@drawable/ic_baseline_account_circle_24"
+            android:id="@+id/nav_account"
+            android:title="@string/nav_account" />
+
+    <item
+            android:icon="@drawable/ic_baseline_backup_24"
+            android:id="@+id/nav_sync"
+            android:title="@string/nav_sync" />
+
+    <item
+            android:icon="@drawable/ic_baseline_clear_24"
+            android:id="@+id/nav_exit"
+            android:title="@string/nav_exit" />
+
+</menu>

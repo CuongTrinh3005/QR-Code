@@ -7,4 +7,9 @@
     <string name="current_date">Thứ Bảy, 01-10-2022 10:42:12</string>
     <string name="time_not_allowed">Ngoài khung giờ quét</string>
     <string name="sync_action">ĐỒNG BỘ</string>
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
+    <string name="nav_account">Cá nhân</string>
+    <string name="nav_sync">Đồng bộ</string>
+    <string name="nav_exit">Thoát</string>
 </resources>
