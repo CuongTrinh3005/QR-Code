@@ -57,10 +57,10 @@ public class Helper {
         int hour = getHourFromTimestamp(), minute = getMinuteFromTimestamp();
 
         if (allowedDaysOfWeek.get(1).equalsIgnoreCase(dayOfWeek) || allowedDaysOfWeek.get(3).equalsIgnoreCase(dayOfWeek)){
-            if((hour == 4  && minute >= 30) || (hour == 5 && minute <= 30)){
+            if((hour == 5  && minute >= 0) || (hour == 6 && minute == 0)){
                 return true;
             }
-            else if((hour == 18 && minute >= 30) || (hour == 19 && minute == 0)){
+            else if((hour == 18 && minute >= 0) || (hour == 19 && minute == 0)){
                 return true;
             }
             else return false;
@@ -75,7 +75,7 @@ public class Helper {
         String dayOfWeek = getDayOfWeek(date);
         int hour = getHourFromTimestamp(), minute = getMinuteFromTimestamp();
 
-        if ((allowedDaysOfWeek.get(5).equalsIgnoreCase(dayOfWeek) && hour == 6 && minute >= 0 && minute <= 30))
+        if ((allowedDaysOfWeek.get(5).equalsIgnoreCase(dayOfWeek) && hour == 6 && minute >= 0 && minute <= 15))
             return true;
 
         return false;
@@ -88,10 +88,10 @@ public class Helper {
 
         if (allowedDaysOfWeek.get(0).equalsIgnoreCase(dayOfWeek) || allowedDaysOfWeek.get(2).equalsIgnoreCase(dayOfWeek)
                 || allowedDaysOfWeek.get(4).equalsIgnoreCase(dayOfWeek)){
-            if((hour == 4  && minute >= 30) || (hour == 5 && minute <= 30)){
+            if((hour == 5  && minute >= 0) || (hour == 6 && minute == 0)){
                 return true;
             }
-            else if((hour == 18 && minute >= 30) || (hour == 19 && minute == 0)){
+            else if((hour == 18 && minute >= 0) || (hour == 19 && minute == 0)){
                 return true;
             }
             else return false;
@@ -106,7 +106,7 @@ public class Helper {
         String dayOfWeek = getDayOfWeek(date);
         int hour = getHourFromTimestamp(), minute = getMinuteFromTimestamp();
 
-        if ((allowedDaysOfWeek.get(5).equalsIgnoreCase(dayOfWeek) && (hour == 7 || (hour == 8 && minute <= 30))))
+        if((allowedDaysOfWeek.get(5).equalsIgnoreCase(dayOfWeek) && (hour == 7 || (hour == 8 && minute <= 30))))
             return true;
 
         return false;
@@ -165,11 +165,6 @@ public class Helper {
             default:
                 break;
         }
-//        currentDate.replace("Mon", "Thứ Hai, ").replace("Tue", "Thứ Ba, ")
-//                .replace("Wed", "Thứ Tư, ").replace("Thu", "Thứ Năm, ")
-//                .replace("Fri", "Thứ Sáu, ").replace("Sat", "Thứ Bảy, ")
-//                .replace("Sun", "Chúa Nhật, ");
-
         return displayDate;
     }
 }

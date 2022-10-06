@@ -29,6 +29,16 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceListAd
     }
 
     @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         String info = attendanceList.get(position).getInfo();
         String scannedDate = attendanceList.get(position).getScannedDate();
