@@ -28,11 +28,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_GOOGLE_ID = "google_id";
     private static final String KEY_DISPLAY_NAME = "display_name";
     private static final String KEY_EMAIL = "email";
-    private static final String KEY_IMAGE_URL = "image_url";
 
     private final String CREATE_SCANNERS_TABLE = "CREATE TABLE " + TABLE_SCANNERS + "("
             + KEY_GOOGLE_ID + " TEXT PRIMARY KEY, " + KEY_DISPLAY_NAME + " TEXT, "
-            + KEY_EMAIL + " TEXT, " + KEY_IMAGE_URL + " TEXT "
+            + KEY_EMAIL + " TEXT "
             + ")";
 
     private final String CREATE_ATTENDANCES_TABLE = "CREATE TABLE " + TABLE_ATTENDANCES + "("
@@ -205,7 +204,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_GOOGLE_ID, scanner.getGoogleId());
         values.put(KEY_DISPLAY_NAME, scanner.getDisplayName());
         values.put(KEY_EMAIL, scanner.getEmail());
-        values.put(KEY_IMAGE_URL, scanner.getImageUrl());
 
         db.insert(TABLE_SCANNERS, null, values);
         //2nd argument is String containing nullColumnHack
@@ -228,12 +226,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_SCANNERS;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-        String googleId="", displayName="", imageUrl="", email="";
+        String googleId="", displayName="", email="";
         if(cursor.moveToFirst()){
+            googleId = cursor.getString(0);
             displayName = cursor.getString(1);
             email = cursor.getString(2);
-            imageUrl = cursor.getString(3);
-            scanner = new Scanner(googleId, displayName, email, imageUrl);
+            scanner = new Scanner(googleId, displayName, email);
         }
 
         return scanner;

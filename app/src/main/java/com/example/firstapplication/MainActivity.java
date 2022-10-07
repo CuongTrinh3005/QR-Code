@@ -113,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         if (id == R.id.nav_account) {
-            Toast.makeText(this, "Account", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_sync) {

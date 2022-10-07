@@ -18,14 +18,13 @@
             android:orientation="vertical"
             android:layout_marginTop="50dp"
             android:layout_width="match_parent"
-            android:layout_height="450dp"/>
+            android:layout_height="500dp"/>
 
     <Button
             android:id="@+id/btnSyncSeparate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:background="#0000FF"
-            android:layout_marginTop="550dp"
+            android:layout_gravity="bottom|center"
             android:text="@string/sync_action"/>
 </FrameLayout>

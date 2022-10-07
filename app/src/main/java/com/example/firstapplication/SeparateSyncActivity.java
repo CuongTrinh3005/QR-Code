@@ -6,10 +6,8 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.*;
@@ -65,7 +62,7 @@ public class SeparateSyncActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_separate_sync);
         initViews();
-
+        databaseHandler.addAttendance(new Attendance("email_testing", "KHAC"));
         mp = MediaPlayer.create(this, R.raw.success);
         String scannerName = databaseHandler.getScannerName();
         String scannedBy = "Người quét: " + scannerName;
@@ -135,8 +132,16 @@ public class SeparateSyncActivity extends AppCompatActivity {
                                 @Override
                                 public void onResponse(String response) {
                                     databaseHandler.updateAttendanceStatus(attendancesPreSynced.get(startIndex), 1);
-                                    int nextIndex = startIndex+1;
-                                    postSpecificRecordInList(attendancesPreSynced, nextIndex, SeparateSyncActivity.this, databaseHandler.getScannerName());
+                                    if(attendancesPreSynced.size() > 1){
+                                        int nextIndex = startIndex+1;
+                                        postSpecificRecordInList(attendancesPreSynced, nextIndex, SeparateSyncActivity.this, databaseHandler.getScannerName());
+                                    }
+                                    else{
+                                        renderRecycleView(1);
+                                        Toast.makeText(btnSync.getContext(), "Đồng bộ thành công", Toast.LENGTH_SHORT).show();
+                                        mp.start();
+                                        progressBar.dismiss();
+                                    }
                                 }
                             }, new Response.ErrorListener() {
                                 @Override
@@ -267,7 +272,6 @@ public class SeparateSyncActivity extends AppCompatActivity {
                 String googleId = account.getId();
                 String displayName = account.getDisplayName();
                 String signedInEmail = account.getEmail();
-                String imageUrl = String.valueOf(account.getPhotoUrl());
                 String url = "https://script.google.com/macros/s/AKfycbyWOtmVYxqViQj5ouhKXomrHs-yPYDlnrifE2g0wKYXZdN4_m78ttzzrNt8M7jomE2q/exec?action=getItems&sheetName=EMAIL"; //just a string
                 ApiUtils utils = new ApiUtils();
                 utils.getAllowedEmails(url, this, new VolleyCallback() {
@@ -283,7 +287,7 @@ public class SeparateSyncActivity extends AppCompatActivity {
                                 if(email.equalsIgnoreCase(signedInEmail)) {
                                     btnSync.setEnabled(false);
                                     isMatching = true;
-                                    Scanner scanner = new Scanner(googleId, displayName, signedInEmail, imageUrl);
+                                    Scanner scanner = new Scanner(googleId, displayName, signedInEmail);
                                     databaseHandler.addScanner(scanner);
 
                                     String welcome = "Xin chào, " + displayName;
