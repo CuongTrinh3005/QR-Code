@@ -13,6 +13,7 @@
     <string name="nav_open">Open</string>
     <string name="nav_close">Close</string>
     <string name="nav_account">Cá nhân</string>
+    <string name="nav_scan">Quét mã</string>
     <string name="nav_sync">Đồng bộ</string>
     <string name="nav_exit">Thoát</string>
     <string name="search_hint">Nhập ID hoặc ngày quét</string>

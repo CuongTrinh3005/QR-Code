@@ -182,5 +182,9 @@ public class Helper {
         handler.addAttendance(new Attendance(4, "01002_Matheu_Do_Minh", "KHAC", "08-10-2022", false));
         handler.addAttendance(new Attendance(5, "00123_Monica_Vu_Thi_Trang", "KHAC", "06-10-2022", false));
         handler.addAttendance(new Attendance(6, "02123_Giuse_Nguyen_Van_A", "KHAC", "06-10-2022", false));
+
+        for(int i=0; i<300; i++){
+            handler.addAttendance(new Attendance(6, "03004_Anna_Vo_Le_Thuy_Duyen", "KHAC", "07-10-2022", false));
+        }
     }
 }

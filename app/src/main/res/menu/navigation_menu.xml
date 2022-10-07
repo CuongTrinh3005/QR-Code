@@ -9,6 +9,11 @@
             android:title="@string/nav_account" />
 
     <item
+            android:icon="@drawable/ic_baseline_camera_front_24"
+            android:id="@+id/nav_scan"
+            android:title="@string/nav_scan"/>
+
+    <item
             android:icon="@drawable/ic_baseline_backup_24"
             android:id="@+id/nav_sync"
             android:title="@string/nav_sync" />

@@ -16,6 +16,7 @@ import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.utils.Helper;
 import com.google.android.material.navigation.NavigationView;
 
+import static com.example.firstapplication.utils.Helper.prepareDataToTesting;
 import static com.example.firstapplication.utils.Helper.setActionBarBackGroundColor;
 
 public class MainActivity extends AppCompatActivity implements
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
+//        prepareDataToTesting(databaseHandler);
         setEvents();
         processSyncing();
     }
@@ -115,18 +117,22 @@ public class MainActivity extends AppCompatActivity implements
         if (id == R.id.nav_account) {
             Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_sync) {
+        }
+        else if (id == R.id.nav_scan) {
+            checkToScan();
+        }
+        else if (id == R.id.nav_sync) {
             Intent intent = new Intent(MainActivity.this, SeparateSyncActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_exit) {
+        }
+        else if (id == R.id.nav_exit) {
             this.finish();
         }
 
         return true;
     }
 
-    @SuppressLint("ResourceType")
-    private void setEvents() {
+    private void checkToScan(){
         String sheetName = "";
         Boolean tueThuAllowed = Helper.checkTueAndThuAllowed();
         if(tueThuAllowed){
@@ -183,6 +189,10 @@ public class MainActivity extends AppCompatActivity implements
         else{
             showPopUpNotification();
         }
+    }
+
+    private void setEvents() {
+        checkToScan();
     }
 
     public void showPopUpNotification() {

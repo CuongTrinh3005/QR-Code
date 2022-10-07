@@ -1,11 +1,10 @@
 package com.example.firstapplication;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.os.*;
 import android.util.SparseArray;
 import android.view.*;
 import android.widget.TextView;
@@ -19,7 +18,6 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.android.material.tabs.TabLayout;
 
 import java.io.IOException;
 import java.util.Date;
@@ -36,6 +34,8 @@ public class ScanningFragment extends Fragment {
     private Boolean cameraSourceStarted=false;
     DatabaseHandler databaseHandler = null;
     MediaPlayer mp = null;
+    Vibrator vibrator = null;
+//    private int duplicateTimes = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,6 +47,7 @@ public class ScanningFragment extends Fragment {
         type = Objects.requireNonNull(getActivity()).getIntent().getStringExtra("sheetName");
         databaseHandler = new DatabaseHandler(getActivity());
         mp = MediaPlayer.create(getContext(), R.raw.beep);
+        vibrator = (Vibrator) Objects.requireNonNull(getContext()).getSystemService(Context.VIBRATOR_SERVICE);
         return view;
     }
 
@@ -121,17 +122,38 @@ public class ScanningFragment extends Fragment {
                             if(!isExisted && intentData.length() > 0 && type.length() > 0){
                                 Attendance attendance = new Attendance(intentData, type);
                                 databaseHandler.addAttendance(attendance);
-                                Toast.makeText(getContext(), "Lưu mới thành công", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Lưu thành công", Toast.LENGTH_SHORT).show();
                                 mp.start();
+//                                duplicateTimes=0;
                             }
-                            else if(isExisted && intentData.length() > 0 && type.length() > 0){
-                                try {
-                                    Thread.sleep(100);
-                                } catch (InterruptedException e) {
-                                    throw new RuntimeException(e);
-                                }
-                                mp.start();
-                            }
+//                            else if(isExisted && intentData.length() > 0 && type.length() > 0){
+//                                txtBarcodeValue.setText(displayName);
+//                                duplicateTimes++;
+//                                if(duplicateTimes == 1){
+//                                    Toast.makeText(getContext(), "Đã lưu", Toast.LENGTH_SHORT).show();
+//                                    try {
+//                                        Thread.sleep(2000);
+//                                    } catch (InterruptedException e) {
+//                                        throw new RuntimeException(e);
+//                                    }
+//                                } else if (duplicateTimes == 2) {
+//                                    final VibrationEffect vibrationEffect;
+//                                    // this is the only type of the vibration which requires system version Oreo (API 26)
+//                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//                                        // this effect creates the vibration of default amplitude for 1000ms(1 sec)
+//                                        vibrationEffect = VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE);
+//
+//                                        // it is safe to cancel other vibrations currently taking place
+//                                        vibrator.cancel();
+//                                        vibrator.vibrate(vibrationEffect);
+//                                        try {
+//                                            Thread.sleep(2000);
+//                                        } catch (InterruptedException e) {
+//                                            throw new RuntimeException(e);
+//                                        }
+//                                    }
+//                                }
+//                            }
                         }
                     });
                 }
