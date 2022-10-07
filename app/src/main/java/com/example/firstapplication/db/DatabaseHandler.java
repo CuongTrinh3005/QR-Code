@@ -138,6 +138,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return false;
     }
 
+    public Boolean checkHaveSyncedAttendance(){
+        // Select All Query
+        String selectQuery = "SELECT * FROM " + TABLE_ATTENDANCES
+                + " WHERE " + KEY_IS_SYNCED + " = 1";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if(cursor.moveToFirst())
+            return true;
+        return false;
+    }
+
     public int updateAttendanceStatus(Attendance attendance, Integer status) {
         try {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -154,16 +166,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public void deleteAttendance(Attendance attendance) {
+    public void deleteSyncedAttendance() {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_ATTENDANCES, KEY_ID + " = ?",
-                new String[]{String.valueOf(attendance.getId())});
+        int syncStatus = 1;
+        db.delete(TABLE_ATTENDANCES, KEY_IS_SYNCED + " = ?",
+                new String[]{String.valueOf(syncStatus)});
         db.close();
-    }
-
-    public void deleteAll() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from " + TABLE_ATTENDANCES);
     }
 
     public Boolean checkAttendanceExist(String type, String id, String date){
@@ -179,22 +187,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst())
             return true;
         return false;
-    }
-
-    public Boolean checkHaveGoogleAccount(){
-        // Select All Query
-        try{
-            String selectQuery = "SELECT * FROM " + TABLE_SCANNERS;
-            SQLiteDatabase db = this.getWritableDatabase();
-            Cursor cursor = db.rawQuery(selectQuery, null);
-            if(cursor.moveToFirst())
-                return true;
-            return false;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
-        }
     }
 
     public void addScanner(Scanner scanner) {

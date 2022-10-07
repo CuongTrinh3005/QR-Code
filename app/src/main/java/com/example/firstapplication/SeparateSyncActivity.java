@@ -1,7 +1,9 @@
 package com.example.firstapplication;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -49,6 +52,7 @@ public class SeparateSyncActivity extends AppCompatActivity {
     private TextView tvHistory;
     private RecyclerView recyclerView;
     private Button btnSync;
+    private ImageView ivDelete;
     private DatabaseHandler databaseHandler = new DatabaseHandler(this);;
     private AttendanceListAdapter attendanceListAdapter = null;
     private RequestQueue queue;
@@ -87,11 +91,38 @@ public class SeparateSyncActivity extends AppCompatActivity {
         setActionBarBackGroundColor(actionBar, "#000000");
 
         tvHistory = findViewById(R.id.tvHistorySeparate);
+        ivDelete = findViewById(R.id.ivDelete);
         recyclerView = findViewById(R.id.recycleViewSeparate);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         renderRecycleView(0);
+        controlDeleteAction();
+        ivDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                databaseHandler.deleteSyncedAttendance();
+                                renderRecycleView(1);
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(SeparateSyncActivity.this);
+                builder.setMessage("Dữ liệu sẽ xoá vĩnh viễn, không thể khôi phục, vui lòng cân nhắc")
+                        .setPositiveButton("Có, xoá", dialogClickListener)
+                        .setNegativeButton("Huỷ", dialogClickListener).show();
+            }
+        });
 
         btnSync = findViewById(R.id.btnSyncSeparate);
         controlSyncButton();
@@ -243,6 +274,10 @@ public class SeparateSyncActivity extends AppCompatActivity {
         btnSync.setEnabled(notBeSyncedYet);
     }
 
+    private void controlDeleteAction(){
+        ivDelete.setEnabled(databaseHandler.checkHaveSyncedAttendance());
+    }
+
     private void authenticate(){
         GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().build();
@@ -336,6 +371,7 @@ public class SeparateSyncActivity extends AppCompatActivity {
         super.onResume();
         renderRecycleView(0);
         controlSyncButton();
+        controlDeleteAction();
     }
 
     @Override
