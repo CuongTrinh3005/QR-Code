@@ -2,12 +2,16 @@ package com.example.firstapplication;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.*;
@@ -53,6 +58,7 @@ public class SeparateSyncActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private Button btnSync;
     private ImageView ivDelete;
+    private SearchView searchView = null;
     private DatabaseHandler databaseHandler = new DatabaseHandler(this);;
     private AttendanceListAdapter attendanceListAdapter = null;
     private RequestQueue queue;
@@ -66,12 +72,59 @@ public class SeparateSyncActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_separate_sync);
         initViews();
-        databaseHandler.addAttendance(new Attendance("email_testing", "KHAC"));
         mp = MediaPlayer.create(this, R.raw.success);
         String scannerName = databaseHandler.getScannerName();
         String scannedBy = "Người quét: " + scannerName;
         if(!"".equals(scannerName))
             Toast.makeText(this, scannedBy, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.search_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+
+        SearchManager searchManager = (SearchManager) SeparateSyncActivity.this.getSystemService(Context.SEARCH_SERVICE);
+
+        if (searchItem != null) {
+            searchView = (SearchView) searchItem.getActionView();
+        }
+        if (searchView != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(SeparateSyncActivity.this.getComponentName()));
+            searchView.setQueryHint(Helper.getStringResources(this, R.string.search_hint));
+        }
+
+        ImageView clearButton = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        clearButton.setOnClickListener(v -> {
+            if(searchView.getQuery().length() == 0) {
+                searchView.setIconified(true);
+            } else {
+                searchView.setQuery("", false);
+                renderRecycleView(1);
+            }
+        });
+
+        final SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if(newText.isEmpty())
+                    renderRecycleView(1);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                renderRecycleViewInSearching(query);
+                return true;
+            }
+        };
+
+        assert searchView != null;
+        searchView.setOnQueryTextListener(queryTextListener);
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -267,6 +320,12 @@ public class SeparateSyncActivity extends AppCompatActivity {
         List<Attendance> attendanceNotSynced = databaseHandler.getAttendancesHaveNotSyncedYet();
 
         tvHistory.setText("Tổng số lượng: " + attendances.size() + " - Chưa đồng bộ: " + attendanceNotSynced.size());
+    }
+
+    private void renderRecycleViewInSearching(String queryStr){
+        List<Attendance> attendances = databaseHandler.query(queryStr);
+        attendanceListAdapter.updateDataset(attendances);
+        tvHistory.setText("Tìm được: " + attendances.size() + " kết quả");
     }
 
     private void controlSyncButton() {

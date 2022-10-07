@@ -153,7 +153,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public int updateAttendanceStatus(Attendance attendance, Integer status) {
         try {
             SQLiteDatabase db = this.getWritableDatabase();
-
             ContentValues values = new ContentValues();
             values.put(KEY_IS_SYNCED, status);
 
@@ -189,6 +188,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return false;
     }
 
+    public List<Attendance> query(String query){
+        query = query.trim();
+        String selectQuery = "SELECT * FROM " + TABLE_ATTENDANCES
+                + " WHERE " + KEY_INFO + " LIKE " + "'%" + query + "%'"
+                + " OR " + KEY_SCANNED_DATE + " LIKE " + "'%" + query + "%'"
+                + " ORDER BY " + KEY_ID + " DESC";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        List<Attendance> attendanceList = new ArrayList<>();
+        if (cursor.moveToFirst())
+            do {
+                Integer id = Integer.parseInt(cursor.getString(0));
+                String info = cursor.getString(1);
+                String type = cursor.getString(2);
+                String dateStr = cursor.getString(3);
+                Boolean isSynced = cursor.getInt(4) > 0;
+                Attendance attendance = new Attendance(id, info, type, dateStr, isSynced);
+
+                attendanceList.add(attendance);
+            } while (cursor.moveToNext());
+        return attendanceList;
+    }
+
+    // Scanner Process here
     public void addScanner(Scanner scanner) {
         SQLiteDatabase db = this.getWritableDatabase();
 

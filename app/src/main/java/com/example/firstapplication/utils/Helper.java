@@ -6,12 +6,15 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import com.example.firstapplication.R;
+import com.example.firstapplication.db.DatabaseHandler;
+import com.example.firstapplication.entity.Attendance;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class Helper {
@@ -166,5 +169,18 @@ public class Helper {
                 break;
         }
         return displayDate;
+    }
+
+    public static String getStringResources(AppCompatActivity activity, int option){
+        return activity.getResources().getString(option);
+    }
+
+    public static void prepareDataToTesting(DatabaseHandler handler){
+        handler.addAttendance(new Attendance(1, "02123_Giuse_Nguyen_Van_A", "KHAC", "01-10-2022", false));
+        handler.addAttendance(new Attendance(2, "04002_Daminh_Vo_Nhat", "KHAC", "01-10-2022", false));
+        handler.addAttendance(new Attendance(3, "05089_Anna_Le_Thi_Truc", "KHAC", "06-10-2022", false));
+        handler.addAttendance(new Attendance(4, "01002_Matheu_Do_Minh", "KHAC", "08-10-2022", false));
+        handler.addAttendance(new Attendance(5, "00123_Monica_Vu_Thi_Trang", "KHAC", "06-10-2022", false));
+        handler.addAttendance(new Attendance(6, "02123_Giuse_Nguyen_Van_A", "KHAC", "06-10-2022", false));
     }
 }
