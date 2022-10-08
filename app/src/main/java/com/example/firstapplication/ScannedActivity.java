@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import com.example.firstapplication.adapters.ViewPageAdapter;
+import com.example.firstapplication.utils.Helper;
 import com.google.android.material.tabs.TabLayout;
 
 import static com.example.firstapplication.utils.Helper.setActionBarBackGroundColor;
@@ -35,8 +36,10 @@ public class ScannedActivity extends AppCompatActivity {
         ViewPageAdapter viewPageAdapter = new ViewPageAdapter(getSupportFragmentManager(),
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
-        viewPageAdapter.addFragment(new ScanningFragment(), "QR Scanner");
-        viewPageAdapter.addFragment(new HistoryFragment(), "History Scanned");
+        viewPageAdapter.addFragment(new ScanningFragment(),
+                Helper.getStringResources(this, R.string.camera_title));
+        viewPageAdapter.addFragment(new HistoryFragment(),
+                Helper.getStringResources(this, R.string.scanned_history_title));
 
         viewPager.setAdapter(viewPageAdapter);
     }

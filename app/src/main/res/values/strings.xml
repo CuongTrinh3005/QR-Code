@@ -5,6 +5,7 @@
     <string name="app_title">QUẢN LÝ ĐIỂM DANH</string>
     <string name="user_detail_title">THÔNG TIN CÁ NHÂN</string>
     <string name="not_signed_in">Chưa đăng nhập</string>
+    <string name="google_sign_in">Đăng nhập</string>
     <string name="church_name">GX. THÁNH GIUSE</string>
     <string name="current_date">Thứ Bảy, 01-10-2022 10:42:12</string>
     <string name="time_not_allowed">Ngoài khung giờ quét</string>
@@ -17,4 +18,10 @@
     <string name="nav_sync">Đồng bộ</string>
     <string name="nav_exit">Thoát</string>
     <string name="search_hint">Nhập ID hoặc ngày quét</string>
+    <string name="scanned_title">THÔNG TIN QUÉT</string>
+    <string name="empty">Trống</string>
+    <string name="prompt">Vui lòng quét mã</string>
+    <string name="exist_notification">Mã này đã quét rồi!</string>
+    <string name="camera_title">Camera</string>
+    <string name="scanned_history_title">Lịch sử quét</string>
 </resources>

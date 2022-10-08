@@ -3,10 +3,7 @@ package com.example.firstapplication;
 import android.content.Intent;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -33,7 +30,7 @@ public class UserInfoActivity extends AppCompatActivity {
     private DatabaseHandler databaseHandler = new DatabaseHandler(this);
     private TextView tvDisplayName, tvEmail;
     private ImageView avatar;
-    private Button btnSignIn;
+    private ImageButton btnSignIn;
     GoogleSignInClient signInClient;
 
     @Override

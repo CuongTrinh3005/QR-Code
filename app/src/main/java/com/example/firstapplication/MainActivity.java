@@ -1,6 +1,5 @@
 package com.example.firstapplication;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,7 +15,6 @@ import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.utils.Helper;
 import com.google.android.material.navigation.NavigationView;
 
-import static com.example.firstapplication.utils.Helper.prepareDataToTesting;
 import static com.example.firstapplication.utils.Helper.setActionBarBackGroundColor;
 
 public class MainActivity extends AppCompatActivity implements
@@ -38,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
-//        prepareDataToTesting(databaseHandler);
         setEvents();
         processSyncing();
     }
