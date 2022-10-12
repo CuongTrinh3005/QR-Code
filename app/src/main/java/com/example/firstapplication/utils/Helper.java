@@ -7,21 +7,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.firstapplication.R;
 import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.entity.Attendance;
-import com.example.firstapplication.enums.DayOfWeek;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.regex.Pattern;
 
 public class Helper {
-    public static final List<String> allowedDaysOfWeek = Arrays.asList("MON", "TUE", "WED", "THU", "FRI", "SUN");
-
     public static String getDateTime(Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         return formatter.format(date);
@@ -36,21 +30,6 @@ public class Helper {
         String dataStr = convertDateToString(date);
         String timestamp = dataStr.split(" ")[2];
         return timestamp;
-    }
-
-    public static Integer getHourFromTimestamp() {
-        String timestamp = getTimestampFromDate(new Date());
-        return Integer.parseInt(timestamp.split(":")[0]);
-    }
-
-    public static Integer getMinuteFromTimestamp() {
-        String timestamp = getTimestampFromDate(new Date());
-        return Integer.parseInt(timestamp.split(":")[1]);
-    }
-
-    public static String getDayOfWeek(Date date) {
-        String dateString = convertDateToString(date);
-        return dateString.split(" ")[0];
     }
 
     public static Integer getDateOfWeek(Date date){
