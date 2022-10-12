@@ -15,6 +15,10 @@ import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.utils.Helper;
 import com.google.android.material.navigation.NavigationView;
 
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.Date;
+
 import static com.example.firstapplication.utils.Helper.setActionBarBackGroundColor;
 
 public class MainActivity extends AppCompatActivity implements
@@ -23,13 +27,13 @@ public class MainActivity extends AppCompatActivity implements
     public ActionBarDrawerToggle actionBarDrawerToggle;
 
     private PopupWindow popupWindow;
-    TextView txtCurrentDate;
     ImageView imageView;
     DatabaseHandler databaseHandler = new DatabaseHandler(this);
     private final String T3T5 = "T3T5";
     private final String giaoLy = "GIAOLY";
     private final String leSom = "LESOM";
     private final String khac = "KHAC";
+    private final String ZONE_ID = "Asia/Ho_Chi_Minh";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,9 +106,6 @@ public class MainActivity extends AppCompatActivity implements
 
         imageView = findViewById(R.id.logo);
         imageView.setBackgroundResource(R.drawable.giuse_church);
-
-        txtCurrentDate = findViewById(R.id.currentDate);
-        txtCurrentDate.setText(Helper.getCurrentTimeDisplay());
     }
 
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -130,23 +131,25 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void checkToScan(){
+        Date date = new Date();
+        LocalTime localTime = LocalTime.now(ZoneId.of(ZONE_ID));
         String sheetName = "";
-        Boolean tueThuAllowed = Helper.checkTueAndThuAllowed();
+        Boolean tueThuAllowed = Helper.checkTueAndThuAllowed(date, localTime);
         if(tueThuAllowed){
             sheetName = T3T5;
         }
 
-        Boolean sundayAllowed = Helper.checkSundayAllowed();
+        Boolean sundayAllowed = Helper.checkSundayAllowed(date, localTime);
         if(sundayAllowed){
             sheetName = giaoLy;
         }
 
-        Boolean sundayEarlyAllowed = Helper.checkSundayEarlyAllowed();
+        Boolean sundayEarlyAllowed = Helper.checkSundayEarlyAllowed(date, localTime);
         if(sundayEarlyAllowed){
             sheetName = leSom;
         }
 
-        Boolean otherAllowed = com.example.firstapplication.utils.Helper.checkOtherDaysAllowed();
+        Boolean otherAllowed = Helper.checkOtherDaysAllowed(date, localTime);
         if(otherAllowed){
             sheetName = khac;
         }
@@ -224,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         initViews();
+        setEvents();
         processSyncing();
     }
 }

@@ -10,10 +10,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.firstapplication.R;
 import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.entity.Attendance;
+import com.example.firstapplication.enums.DayOfWeek;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -31,9 +33,6 @@ public class Helper {
     }
 
     public static String getTimestampFromDate(Date date) {
-//        SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-//        String dateString = formatter.format(date);
-//        return dateString.split(" ")[1];
         String dataStr = convertDateToString(date);
         String timestamp = dataStr.split(" ")[2];
         return timestamp;
@@ -54,64 +53,61 @@ public class Helper {
         return dateString.split(" ")[0];
     }
 
-    public static Boolean checkTueAndThuAllowed() {
-        Date date = new Date();
-        String dayOfWeek = getDayOfWeek(date);
-        int hour = getHourFromTimestamp(), minute = getMinuteFromTimestamp();
+    public static Integer getDateOfWeek(Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal.get(Calendar.DAY_OF_WEEK);
+    }
 
-        if (allowedDaysOfWeek.get(1).equalsIgnoreCase(dayOfWeek) || allowedDaysOfWeek.get(3).equalsIgnoreCase(dayOfWeek)){
+    public static Boolean checkTueAndThuAllowed(Date date, LocalTime localTime) {
+        Integer dayOfWeek = getDateOfWeek(date);
+        if (dayOfWeek == Calendar.TUESDAY || dayOfWeek == Calendar.THURSDAY){
+            int hour = localTime.getHour(), minute = localTime.getMinute();
             if((hour == 5  && minute >= 0) || (hour == 6 && minute == 0)){
                 return true;
             }
-            else if((hour == 18 && minute >= 0) || (hour == 19 && minute == 0)){
-                return true;
-            }
-            else return false;
+            else return (hour == 18 && minute >= 0) || (hour == 19 && minute == 0);
         }
         else{
             return false;
         }
     }
 
-    public static Boolean checkSundayEarlyAllowed() {
-        Date date = new Date();
-        String dayOfWeek = getDayOfWeek(date);
-        int hour = getHourFromTimestamp(), minute = getMinuteFromTimestamp();
-
-        if ((allowedDaysOfWeek.get(5).equalsIgnoreCase(dayOfWeek) && hour == 6 && minute >= 0 && minute <= 15))
-            return true;
-
+    public static Boolean checkSundayEarlyAllowed(Date date, LocalTime localTime) {
+        Integer dayOfWeek = getDateOfWeek(date);
+        if (dayOfWeek == Calendar.SUNDAY){
+            int hour = localTime.getHour(), minute = localTime.getMinute();
+            return hour == 6 && minute >= 0 && minute <= 15;
+        }
         return false;
     }
 
-    public static Boolean checkOtherDaysAllowed() {
-        Date date = new Date();
-        String dayOfWeek = getDayOfWeek(date);
-        int hour = getHourFromTimestamp(), minute = getMinuteFromTimestamp();
+    public static Boolean checkOtherDaysAllowed(Date date, LocalTime localTime) {
+        Integer dayOfWeek = getDateOfWeek(date);
 
-        if (allowedDaysOfWeek.get(0).equalsIgnoreCase(dayOfWeek) || allowedDaysOfWeek.get(2).equalsIgnoreCase(dayOfWeek)
-                || allowedDaysOfWeek.get(4).equalsIgnoreCase(dayOfWeek)){
+        boolean isMonday = dayOfWeek==Calendar.MONDAY;
+        boolean isWednesday = dayOfWeek==Calendar.WEDNESDAY;
+        boolean isFriday = dayOfWeek==Calendar.FRIDAY;
+
+        if (isMonday || isWednesday || isFriday){
+            int hour = localTime.getHour();
+            int minute = localTime.getMinute();
             if((hour == 5  && minute >= 0) || (hour == 6 && minute == 0)){
                 return true;
             }
-            else if((hour == 18 && minute >= 0) || (hour == 19 && minute == 0)){
-                return true;
-            }
-            else return false;
+            else return (hour == 18 && minute >= 0) || (hour == 19 && minute == 0);
         }
         else{
             return false;
         }
     }
 
-    public static Boolean checkSundayAllowed() {
-        Date date = new Date();
-        String dayOfWeek = getDayOfWeek(date);
-        int hour = getHourFromTimestamp(), minute = getMinuteFromTimestamp();
-
-        if((allowedDaysOfWeek.get(5).equalsIgnoreCase(dayOfWeek) && (hour == 7 || (hour == 8 && minute <= 30))))
-            return true;
-
+    public static Boolean checkSundayAllowed(Date date, LocalTime localTime) {
+        Integer dayOfWeek = getDateOfWeek(date);
+        if(dayOfWeek == Calendar.SUNDAY){
+            int hour = localTime.getHour(), minute = localTime.getMinute();
+            return hour == 7 || (hour == 8 && minute <= 30);
+        }
         return false;
     }
 
@@ -130,45 +126,6 @@ public class Helper {
                 .getSystemService(Context.CONNECTIVITY_SERVICE));
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-    public static String getCurrentTimeDisplay(){
-        String currentDate = convertDateToString(new Date());
-        String dayOfWeek = getDayOfWeek(new Date());
-        String displayDate = "";
-        switch (dayOfWeek){
-            case "Mon":{
-                displayDate = "Thứ Hai, " + currentDate.substring(3);
-                break;
-            }
-            case "Tue":{
-                displayDate = "Thứ Ba, " + currentDate.substring(3);
-                break;
-            }
-            case "Wed":{
-                displayDate = "Thứ Tư, " + currentDate.substring(3);
-                break;
-            }
-            case "Thu":{
-                displayDate = "Thứ Năm, " + currentDate.substring(3);
-                break;
-            }
-            case "Fri":{
-                displayDate = "Thứ Sáu, " + currentDate.substring(3);
-                break;
-            }
-            case "Sat":{
-                displayDate = "Thứ Bảy, " + currentDate.substring(3);
-                break;
-            }
-            case "Sun":{
-                displayDate = "Chúa Nhật, " + currentDate.substring(3);
-                break;
-            }
-            default:
-                break;
-        }
-        return displayDate;
     }
 
     public static String getStringResources(AppCompatActivity activity, int option){
