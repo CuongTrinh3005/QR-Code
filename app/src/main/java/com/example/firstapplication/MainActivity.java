@@ -227,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         initViews();
-        setEvents();
         processSyncing();
     }
 }

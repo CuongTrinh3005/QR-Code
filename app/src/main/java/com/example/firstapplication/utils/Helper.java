@@ -85,7 +85,12 @@ public class Helper {
         Integer dayOfWeek = getDateOfWeek(date);
         if(dayOfWeek == Calendar.SUNDAY){
             int hour = localTime.getHour(), minute = localTime.getMinute();
-            return hour == 7 || (hour == 8 && minute <= 30);
+            if(hour == 7 || (hour == 8 && minute <= 30)){
+                return true;
+            }
+            else if((hour == 15 && minute >= 30) || (hour == 16 && minute == 0)){
+                return true;
+            } else return (hour == 17 && minute >= 0) || (hour == 18 && minute == 0);
         }
         return false;
     }
