@@ -1,11 +1,7 @@
 package com.example.firstapplication;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.android.volley.*;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.firstapplication.adapters.AttendanceListAdapter;
 import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.entity.Attendance;
@@ -39,23 +32,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class HistoryFragment extends Fragment {
-    String URL = "https://script.google.com/macros/s/AKfycbyWOtmVYxqViQj5ouhKXomrHs-yPYDlnrifE2g0wKYXZdN4_m78ttzzrNt8M7jomE2q/exec";
     private View view;
     private TextView tvHistory;
     private RecyclerView recyclerView;
     private Button btnSync;
     private DatabaseHandler databaseHandler = null;
     private AttendanceListAdapter attendanceListAdapter = null;
-    private RequestQueue queue;
-    MediaPlayer mp = null;
-    private Integer startIndex = 0;
-    ProgressDialog progressBar;
     GoogleSignInClient signInClient;
 
     @Override
@@ -65,7 +51,6 @@ public class HistoryFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_history, container, false);
         databaseHandler = new DatabaseHandler(getActivity());
         initView(view);
-        mp = MediaPlayer.create(getContext(), R.raw.success);
 
         String scannerName = databaseHandler.getScannerName();
         String scannedBy = "Người quét: " + scannerName;
@@ -104,108 +89,11 @@ public class HistoryFragment extends Fragment {
                     return;
                 }
 
-                progressBar = new ProgressDialog(getContext());    //ProgressDialog
-                progressBar.setTitle("Đồng bộ dữ liệu");
-                progressBar.setMessage("Vui lòng chờ trong ít phút ... ");
-                progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                progressBar.setCancelable(false);
-                progressBar.show();
-                btnSync.setEnabled(false);
                 Toast.makeText(getContext(), "Quá trình đồng bộ bắt đầu ...", Toast.LENGTH_LONG).show();
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            List<Attendance> attendancesPreSynced = databaseHandler.getAttendancesHaveNotSyncedYet();
-                            Context context = getContext();
-                            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    databaseHandler.updateAttendanceStatus(attendancesPreSynced.get(startIndex), 1);
-                                    int nextIndex = startIndex+1;
-                                    postSpecificRecordInList(attendancesPreSynced, nextIndex, context, databaseHandler.getScannerName());
-                                }
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Log.d("error", error.toString());
-                                    Toast.makeText(getContext(),
-                                            "Đã có lỗi, vui lòng thử lại: " + error.toString(),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            }) {
-                                @Override
-                                protected Map<String, String> getParams() {
-                                    Map<String, String> params = new HashMap<>();
-                                    params.put("action", "addItem");
-                                    params.put("sheetName", attendancesPreSynced.get(startIndex).getType());
-                                    params.put("info", attendancesPreSynced.get(startIndex).getInfo());
-                                    params.put("scannedDate", attendancesPreSynced.get(startIndex).getScannedDate());
-                                    params.put("scannedBy", databaseHandler.getScannerName());
-
-                                    return params;
-                                }
-                            };
-                            int socketTimeout = 300000;
-
-                            RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0,
-                                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-                            stringRequest.setRetryPolicy(retryPolicy);
-                            queue = Volley.newRequestQueue(context);
-                            queue.add(stringRequest);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                            Toast.makeText(btnSync.getContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }).start();
+                Intent intent = new Intent(getContext(), CircularSyncingActivity.class);
+                startActivity(intent);
             }
         });
-    }
-
-    private void postSpecificRecordInList(List<Attendance> attendancesPreSynced, int index, Context context, String scannerName){
-        Attendance attendancePreSynced = attendancesPreSynced.get(index);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                databaseHandler.updateAttendanceStatus(attendancePreSynced, 1);
-                if(index<attendancesPreSynced.size()-1){
-                    int nextIndex = index+1;
-                    postSpecificRecordInList(attendancesPreSynced, nextIndex, context, scannerName);
-                }
-                else{
-                    renderRecycleView(1);
-                    Toast.makeText(btnSync.getContext(), "Đồng bộ thành công", Toast.LENGTH_SHORT).show();
-                    mp.start();
-                    progressBar.dismiss();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("error", error.toString());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("action", "addItem");
-                params.put("sheetName", attendancePreSynced.getType());
-                params.put("info", attendancePreSynced.getInfo());
-                params.put("scannedDate", attendancePreSynced.getScannedDate());
-                params.put("scannedBy", scannerName);
-
-                return params;
-            }
-        };
-        int socketTimeout = 300000;
-
-        RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        stringRequest.setRetryPolicy(retryPolicy);
-        queue = Volley.newRequestQueue(context);
-        queue.add(stringRequest);
     }
 
     private void renderRecycleView(int option){

@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements
                     switch (which){
                         case DialogInterface.BUTTON_POSITIVE:
                             //Yes button clicked
-                            Intent intent = new Intent(MainActivity.this, SeparateSyncActivity.class);
+                            Intent intent = new Intent(MainActivity.this, SeparateHistoryActivity.class);
                             startActivity(intent);
                             break;
 
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements
             checkToScan();
         }
         else if (id == R.id.nav_sync) {
-            Intent intent = new Intent(MainActivity.this, SeparateSyncActivity.class);
+            Intent intent = new Intent(MainActivity.this, SeparateHistoryActivity.class);
             startActivity(intent);
         }
         else if (id == R.id.nav_exit) {

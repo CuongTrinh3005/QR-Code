@@ -3,16 +3,16 @@
           package="com.example.firstapplication">
 
     <uses-permission android:name="android.permission.CAMERA"/>
+
     <uses-feature
             android:name="android.hardware.camera"
             android:required="false"/>
-
     <uses-feature android:name="android.hardware.camera.autofocus"/>
 
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
             android:allowBackup="true"
@@ -22,10 +22,13 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.FirstApplication">
         <activity
+                android:name=".CircularSyncingActivity"
+                android:exported="true"/>
+        <activity
                 android:name=".UserInfoActivity"
                 android:exported="true"/>
         <activity
-                android:name=".SeparateSyncActivity"
+                android:name=".SeparateHistoryActivity"
                 android:exported="true"/>
         <activity
                 android:name=".ScannedActivity"

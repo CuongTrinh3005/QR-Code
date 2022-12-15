@@ -1,15 +1,11 @@
 package com.example.firstapplication;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,9 +21,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.android.volley.*;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.firstapplication.adapters.AttendanceListAdapter;
 import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.entity.Attendance;
@@ -46,33 +39,25 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.example.firstapplication.utils.Helper.setActionBarBackGroundColor;
 
-public class SeparateSyncActivity extends AppCompatActivity {
-    String URL = "https://script.google.com/macros/s/AKfycbyWOtmVYxqViQj5ouhKXomrHs-yPYDlnrifE2g0wKYXZdN4_m78ttzzrNt8M7jomE2q/exec";
+public class SeparateHistoryActivity extends AppCompatActivity {
     private TextView tvHistory;
     private RecyclerView recyclerView;
     private Button btnSync;
     private ImageView ivDelete;
     private SearchView searchView = null;
-    private DatabaseHandler databaseHandler = new DatabaseHandler(this);;
+    private DatabaseHandler databaseHandler = new DatabaseHandler(this);
     private AttendanceListAdapter attendanceListAdapter = null;
-    private RequestQueue queue;
-    MediaPlayer mp = null;
-    private Integer startIndex = 0;
-    ProgressDialog progressBar;
     GoogleSignInClient signInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_separate_sync);
+        setContentView(R.layout.activity_separate_history);
         initViews();
-        mp = MediaPlayer.create(this, R.raw.success);
         String scannerName = databaseHandler.getScannerName();
         String scannedBy = "Người quét: " + scannerName;
         if(!"".equals(scannerName))
@@ -86,13 +71,13 @@ public class SeparateSyncActivity extends AppCompatActivity {
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
 
-        SearchManager searchManager = (SearchManager) SeparateSyncActivity.this.getSystemService(Context.SEARCH_SERVICE);
+        SearchManager searchManager = (SearchManager) SeparateHistoryActivity.this.getSystemService(Context.SEARCH_SERVICE);
 
         if (searchItem != null) {
             searchView = (SearchView) searchItem.getActionView();
         }
         if (searchView != null) {
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(SeparateSyncActivity.this.getComponentName()));
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(SeparateHistoryActivity.this.getComponentName()));
             searchView.setQueryHint(Helper.getStringResources(this, R.string.search_hint));
         }
 
@@ -170,7 +155,7 @@ public class SeparateSyncActivity extends AppCompatActivity {
                     }
                 };
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(SeparateSyncActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(SeparateHistoryActivity.this);
                 builder.setMessage("Dữ liệu sẽ xoá vĩnh viễn, không thể khôi phục, vui lòng cân nhắc")
                         .setPositiveButton("Có, xoá", dialogClickListener)
                         .setNegativeButton("Huỷ", dialogClickListener).show();
@@ -183,8 +168,8 @@ public class SeparateSyncActivity extends AppCompatActivity {
         btnSync.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!Helper.isNetworkAvailable(SeparateSyncActivity.this)){
-                    Toast.makeText(SeparateSyncActivity.this, "Vui lòng kiểm tra kết nối mạng...", Toast.LENGTH_LONG).show();
+                if(!Helper.isNetworkAvailable(SeparateHistoryActivity.this)){
+                    Toast.makeText(SeparateHistoryActivity.this, "Vui lòng kiểm tra kết nối mạng...", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -194,119 +179,15 @@ public class SeparateSyncActivity extends AppCompatActivity {
 
                 scannerName = databaseHandler.getScannerName();
                 if("".equals(scannerName)){
-                    Toast.makeText(SeparateSyncActivity.this, "Vui lòng thực hiện đăng nhập", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SeparateHistoryActivity.this, "Vui lòng thực hiện đăng nhập", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                progressBar = new ProgressDialog(SeparateSyncActivity.this);    //ProgressDialog
-                progressBar.setTitle("Đồng bộ dữ liệu");
-                progressBar.setMessage("Vui lòng chờ trong ít phút ... ");
-                progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                progressBar.setCancelable(false);
-                progressBar.show();
-                btnSync.setEnabled(false);
-                Toast.makeText(SeparateSyncActivity.this, "Quá trình đồng bộ bắt đầu ...", Toast.LENGTH_LONG).show();
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            List<Attendance> attendancesPreSynced = databaseHandler.getAttendancesHaveNotSyncedYet();
-                            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    databaseHandler.updateAttendanceStatus(attendancesPreSynced.get(startIndex), 1);
-                                    if(attendancesPreSynced.size() > 1){
-                                        int nextIndex = startIndex+1;
-                                        postSpecificRecordInList(attendancesPreSynced, nextIndex, SeparateSyncActivity.this, databaseHandler.getScannerName());
-                                    }
-                                    else{
-                                        renderRecycleView(1);
-                                        Toast.makeText(btnSync.getContext(), "Đồng bộ thành công", Toast.LENGTH_SHORT).show();
-                                        mp.start();
-                                        progressBar.dismiss();
-                                    }
-                                }
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Log.d("error", error.toString());
-                                    Toast.makeText(SeparateSyncActivity.this,
-                                            "Đã có lỗi, vui lòng thử lại: " + error.toString(),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            }) {
-                                @Override
-                                protected Map<String, String> getParams() {
-                                    Map<String, String> params = new HashMap<>();
-                                    params.put("action", "addItem");
-                                    params.put("sheetName", attendancesPreSynced.get(startIndex).getType());
-                                    params.put("info", attendancesPreSynced.get(startIndex).getInfo());
-                                    params.put("scannedDate", attendancesPreSynced.get(startIndex).getScannedDate());
-                                    params.put("scannedBy", databaseHandler.getScannerName());
-
-                                    return params;
-                                }
-                            };
-                            int socketTimeout = 300000;
-
-                            RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0,
-                                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-                            stringRequest.setRetryPolicy(retryPolicy);
-                            queue = Volley.newRequestQueue(SeparateSyncActivity.this);
-                            queue.add(stringRequest);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                            Toast.makeText(btnSync.getContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }).start();
+                Toast.makeText(SeparateHistoryActivity.this, "Quá trình đồng bộ bắt đầu ...", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(SeparateHistoryActivity.this, CircularSyncingActivity.class);
+                startActivity(intent);
             }
         });
-    }
-
-    private void postSpecificRecordInList(List<Attendance> attendancesPreSynced, int index, Context context, String scannerName){
-        Attendance attendancePreSynced = attendancesPreSynced.get(index);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                databaseHandler.updateAttendanceStatus(attendancePreSynced, 1);
-                if(index<attendancesPreSynced.size()-1){
-                    int nextIndex = index+1;
-                    postSpecificRecordInList(attendancesPreSynced, nextIndex, context, scannerName);
-                }
-                else{
-                    renderRecycleView(1);
-                    Toast.makeText(btnSync.getContext(), "Đồng bộ thành công", Toast.LENGTH_SHORT).show();
-                    mp.start();
-                    progressBar.dismiss();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("error", error.toString());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("action", "addItem");
-                params.put("sheetName", attendancePreSynced.getType());
-                params.put("info", attendancePreSynced.getInfo());
-                params.put("scannedDate", attendancePreSynced.getScannedDate());
-                params.put("scannedBy", scannerName);
-
-                return params;
-            }
-        };
-        int socketTimeout = 300000;
-
-        RetryPolicy retryPolicy = new DefaultRetryPolicy(socketTimeout, 0,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        stringRequest.setRetryPolicy(retryPolicy);
-        queue = Volley.newRequestQueue(context);
-        queue.add(stringRequest);
     }
 
     private void renderRecycleView(int option){
@@ -361,7 +242,7 @@ public class SeparateSyncActivity extends AppCompatActivity {
 
     private Boolean saveScannerInfo(){
         try{
-            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(SeparateSyncActivity.this);
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(SeparateHistoryActivity.this);
             if(account!=null){
                 String googleId = account.getId();
                 String displayName = account.getDisplayName();
@@ -385,14 +266,14 @@ public class SeparateSyncActivity extends AppCompatActivity {
                                     databaseHandler.addScanner(scanner);
 
                                     String welcome = "Xin chào, " + displayName;
-                                    Toast.makeText(SeparateSyncActivity.this, welcome, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SeparateHistoryActivity.this, welcome, Toast.LENGTH_SHORT).show();
                                     btnSync.performClick();
                                     break;
                                 }
                             }
                             if(!isMatching){
                                 logOut();
-                                Toast.makeText(SeparateSyncActivity.this, "Tài khoản chưa đăng ký với admin!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SeparateHistoryActivity.this, "Tài khoản chưa đăng ký với admin!", Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
@@ -420,7 +301,7 @@ public class SeparateSyncActivity extends AppCompatActivity {
                 }
             } catch (ApiException e) {
                 e.printStackTrace();
-                Toast.makeText(SeparateSyncActivity.this, "Đăng nhập thất bại!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SeparateHistoryActivity.this, "Đăng nhập thất bại!", Toast.LENGTH_SHORT).show();
             }
         }
     }
