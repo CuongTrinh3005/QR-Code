@@ -67,14 +67,15 @@ public class Helper {
         boolean isMonday = dayOfWeek==Calendar.MONDAY;
         boolean isWednesday = dayOfWeek==Calendar.WEDNESDAY;
         boolean isFriday = dayOfWeek==Calendar.FRIDAY;
+        boolean isSaturday = dayOfWeek==Calendar.SATURDAY;
 
-        if (isMonday || isWednesday || isFriday){
+        if (isMonday || isWednesday || isFriday || isSaturday){
             int hour = localTime.getHour();
             int minute = localTime.getMinute();
             if((hour == 5  && minute >= 0) || (hour == 6 && minute == 0)){
                 return true;
             }
-            else return (hour == 18 && minute >= 0) || (hour == 19 && minute == 0);
+            else return (!isSaturday && (hour == 18 && minute >= 0) || (hour == 19 && minute == 0));
         }
         else{
             return false;
