@@ -173,6 +173,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void deleteSyncedAttendanceById(Integer id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int syncStatus = 1;
+        db.delete(TABLE_ATTENDANCES, KEY_ID + " = ? AND " + KEY_IS_SYNCED + " = ?",
+                new String[]{String.valueOf(id), String.valueOf(syncStatus)});
+        db.close();
+    }
+
     public Boolean checkAttendanceExist(String type, String id, String date){
         String dateToQuery = date.split(" ")[0];
         String selectQuery = "SELECT * FROM " + TABLE_ATTENDANCES

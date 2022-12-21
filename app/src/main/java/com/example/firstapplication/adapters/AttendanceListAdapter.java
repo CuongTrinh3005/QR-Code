@@ -1,5 +1,7 @@
 package com.example.firstapplication.adapters;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.firstapplication.R;
+import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.entity.Attendance;
 
 import java.util.List;
@@ -19,6 +22,18 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceListAd
 
     public AttendanceListAdapter(List<Attendance> attendanceList) {
         this.attendanceList = attendanceList;
+    }
+
+    public interface OnDecreaseListener{
+        void onNumberCutDown();
+    }
+
+    OnDecreaseListener decreaseListener;
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        decreaseListener = (OnDecreaseListener) recyclerView.getContext();
+        super.onAttachedToRecyclerView(recyclerView);
     }
 
     @NonNull
@@ -40,6 +55,7 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceListAd
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+        Integer id = attendanceList.get(position).getId();
         String info = attendanceList.get(position).getInfo();
         String scannedDate = attendanceList.get(position).getScannedDate();
         String type = attendanceList.get(position).getType();
@@ -60,6 +76,44 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceListAd
                 Toast.makeText(view.getContext(), info, Toast.LENGTH_SHORT).show();
             }
         });
+
+        holder.relativeLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if("true".equalsIgnoreCase(status)){
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    DatabaseHandler databaseHandler = new DatabaseHandler(v.getContext());
+                                    try{
+                                        databaseHandler.deleteSyncedAttendanceById(id);
+                                        removeDatasetById(id);
+                                        decreaseListener.onNumberCutDown();
+                                    }
+                                    catch (Exception ex){
+                                        Toast.makeText(v.getContext(), "Xoá thất bại", Toast.LENGTH_SHORT).show();
+                                    }
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    //No button clicked
+                                    break;
+                            }
+                        }
+                    };
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    String deletingInfo = String.format("%s - %s -%s sẽ xoá vĩnh viễn, không thể khôi phục!",
+                            info, type, scannedDate);
+                    builder.setMessage(deletingInfo)
+                            .setPositiveButton("Có, xoá", dialogClickListener)
+                            .setNegativeButton("Huỷ", dialogClickListener).show();
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -70,6 +124,11 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceListAd
     public void updateDataset(List<Attendance> newList){
         this.attendanceList.clear();
         this.attendanceList.addAll(newList);
+        notifyDataSetChanged();
+    }
+
+    public void removeDatasetById(int id){
+        this.attendanceList.removeIf(attendance -> attendance.getId() == id);
         notifyDataSetChanged();
     }
 

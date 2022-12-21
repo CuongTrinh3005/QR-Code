@@ -43,7 +43,7 @@ import java.util.List;
 
 import static com.example.firstapplication.utils.Helper.setActionBarBackGroundColor;
 
-public class SeparateHistoryActivity extends AppCompatActivity {
+public class SeparateHistoryActivity extends AppCompatActivity implements AttendanceListAdapter.OnDecreaseListener {
     private TextView tvHistory;
     private RecyclerView recyclerView;
     private Button btnSync;
@@ -317,5 +317,12 @@ public class SeparateHistoryActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
+    }
+
+    @Override
+    public void onNumberCutDown() {
+        List<Attendance> attendances = databaseHandler.getAllAttendances();
+        List<Attendance> attendanceNotSynced = databaseHandler.getAttendancesHaveNotSyncedYet();
+        tvHistory.setText("Tổng số lượng: " + attendances.size() + " - Chưa đồng bộ: " + attendanceNotSynced.size());
     }
 }
