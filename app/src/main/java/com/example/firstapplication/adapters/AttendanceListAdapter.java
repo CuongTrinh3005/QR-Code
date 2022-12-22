@@ -32,8 +32,12 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceListAd
 
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
-        decreaseListener = (OnDecreaseListener) recyclerView.getContext();
-        super.onAttachedToRecyclerView(recyclerView);
+        try{
+            decreaseListener = (OnDecreaseListener) recyclerView.getContext();
+            super.onAttachedToRecyclerView(recyclerView);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @NonNull
