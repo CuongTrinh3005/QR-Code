@@ -3,6 +3,7 @@ package com.example.firstapplication;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
@@ -10,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import com.example.firstapplication.db.DatabaseHandler;
 import com.example.firstapplication.utils.Helper;
@@ -86,6 +88,10 @@ public class MainActivity extends AppCompatActivity implements
         setActionBarBackGroundColor(actionBar, "#000000");
 
         NavigationView mNavigationView = (NavigationView) findViewById(R.id.navigationView);
+        TextView syncRecordNumber = (TextView) MenuItemCompat.getActionView(mNavigationView.getMenu()
+                .findItem(R.id.nav_sync));
+
+        initializeCountDrawer(syncRecordNumber);
 
         if (mNavigationView != null) {
             mNavigationView.setNavigationItemSelectedListener(this);
@@ -106,6 +112,16 @@ public class MainActivity extends AppCompatActivity implements
 
         imageView = findViewById(R.id.logo);
         imageView.setBackgroundResource(R.drawable.giuse_church);
+    }
+
+    private void initializeCountDrawer(TextView syncRecordNumber) {
+        syncRecordNumber.setGravity(Gravity.CENTER_VERTICAL);
+        syncRecordNumber.setTypeface(null, Typeface.BOLD);
+        syncRecordNumber.setTextColor(getResources().getColor(R.color.red));
+
+        Integer noNonSyncedRecords = databaseHandler.getAttendancesHaveNotSyncedYet().size();
+        if(noNonSyncedRecords > 0)
+            syncRecordNumber.setText(String.valueOf(noNonSyncedRecords));
     }
 
     public boolean onNavigationItemSelected(MenuItem item) {
