@@ -24,6 +24,7 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.google.android.material.tabs.TabLayout;
 import com.google.zxing.Result;
 
 import java.io.IOException;
@@ -100,6 +101,9 @@ public class ScanningFragment extends Fragment {
                                 databaseHandler.addAttendance(attendance);
                                 Toast.makeText(getContext(), "Lưu thành công", Toast.LENGTH_SHORT).show();
                                 mp.start();
+                                TabLayout tabLayout = Objects.requireNonNull(getActivity()).findViewById(R.id.tabLayout);
+                                Objects.requireNonNull(tabLayout.getTabAt(1)).getOrCreateBadge()
+                                        .setNumber(databaseHandler.getAttendancesHaveNotSyncedYet().size());
                                 startTime = System.currentTimeMillis();
                             }
                             else if (isExisted && intentData.length() > 0 && type.length() > 0) {

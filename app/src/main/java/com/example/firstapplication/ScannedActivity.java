@@ -2,20 +2,26 @@ package com.example.firstapplication;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import com.example.firstapplication.adapters.ViewPageAdapter;
+import com.example.firstapplication.db.DatabaseHandler;
+import com.example.firstapplication.entity.Attendance;
 import com.example.firstapplication.utils.Helper;
 import com.google.android.material.tabs.TabLayout;
+
+import java.util.List;
 
 import static com.example.firstapplication.utils.Helper.setActionBarBackGroundColor;
 
 public class ScannedActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private DatabaseHandler databaseHandler = new DatabaseHandler(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +46,10 @@ public class ScannedActivity extends AppCompatActivity {
                 Helper.getStringResources(this, R.string.camera_title));
         viewPageAdapter.addFragment(new HistoryFragment(),
                 Helper.getStringResources(this, R.string.scanned_history_title));
+
+        Integer noAttendanceNotSynced = databaseHandler.getAttendancesHaveNotSyncedYet().size();
+        if(noAttendanceNotSynced > 0)
+            tabLayout.getTabAt(1).getOrCreateBadge().setNumber(noAttendanceNotSynced);
 
         viewPager.setAdapter(viewPageAdapter);
     }
