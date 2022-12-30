@@ -1,6 +1,7 @@
 package com.example.firstapplication;
 
-import android.app.AlertDialog;
+import android.app.*;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -14,11 +15,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import com.example.firstapplication.db.DatabaseHandler;
+import com.example.firstapplication.services.AlarmReceiver;
 import com.example.firstapplication.utils.Helper;
 import com.google.android.material.navigation.NavigationView;
 
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 
 import static com.example.firstapplication.utils.Helper.setActionBarBackGroundColor;
@@ -44,6 +47,25 @@ public class MainActivity extends AppCompatActivity implements
         initViews();
         setEvents();
         processSyncing();
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        Intent notificationIntent = new Intent(this, AlarmReceiver.class);
+        PendingIntent broadcast = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            broadcast = PendingIntent.getBroadcast(this, 100, notificationIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+        }
+        else
+        {
+            broadcast = PendingIntent.getBroadcast(this, 100, notificationIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 19);
+        cal.set(Calendar.MINUTE, 40);
+        cal.set(Calendar.SECOND, 0);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, broadcast);
     }
 
     private void processSyncing() {

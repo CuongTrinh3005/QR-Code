@@ -24,4 +24,7 @@
     <string name="exist_notification">Mã này đã quét rồi!</string>
     <string name="camera_title">Camera</string>
     <string name="scanned_history_title">Lịch sử quét</string>
+    <string name="channel_notification_title">ĐỒNG BỘ DỮ LIỆU</string>
+    <string name="notification_title">Chưa đồng bộ dữ liệu?</string>
+    <string name="notification_description">Hãy kết nối Wifi và đồng bộ ngay!</string>
 </resources>
